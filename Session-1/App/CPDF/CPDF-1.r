@@ -10,8 +10,6 @@ options(device="windows")
 library(shiny)
 library(ggplot2)
 
-setwd("C:\\Projects\\Duke\\Co-lab\\Shiny\\Session-1-NPDHist-Tables\\CourseMaterial")
-
 #######################################################################################################
 # Read U.S. Office of Personnel Management Central Personnel Data File (CPDF)
 
@@ -34,6 +32,7 @@ setwd("C:\\Projects\\Duke\\Co-lab\\Shiny\\Session-1-NPDHist-Tables\\CourseMateri
 # n and sumPay are aggregated within fy, agency, age, grade, occCat, yearsEd combinations
 #######################################################################################################
 
+setwd("C:\\Projects\\Duke\\Co-lab\\Shiny\\Session-1-NPDHist-CPDF\\App\\CPDF")
 cpdf <- read.table("CPDFAggregateDataBuzzfeed-Agency.csv", header=T, sep=",", strip.white=T)
 
 # Compute mean pay per category (all employees in category assigned identical, mean, pay)
