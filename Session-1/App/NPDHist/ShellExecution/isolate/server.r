@@ -80,7 +80,11 @@ shinyServer (
     # Cases have been observed where reactive values are not available (such as when placing the executed
     # function directly in the renderPlot() call)
     output$plot <- renderPlot(npdPlot(input$n, input$w, input$mean, input$sd, input$barColor,
-                              input$dispCurve, input$curveColor))
+                              isolate(input$dispCurve), input$curveColor))
+
+    output$plot <- renderPlot({npdPlot(isolate(input$n), isolate(input$w), isolate(input$mean), isolate(input$sd), isolate(input$barColor),
+                              input$dispCurve, isolate(input$curveColor))
+                              cat("A")})
 
     # Generate a parameter (in)validation message (message is NULL if valid)
     output$msg <- renderText(HTML(msg(input$w, input$sd)))
