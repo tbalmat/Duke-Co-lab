@@ -26,7 +26,7 @@ library(ggplot2)
 # occCat ....... occupational category 
 # yearsEd ...... years of education
 # n ............ number of observations (employees) in fy, agency, age, grade, occCat, yearsEd combination
-# sumPay ....... sum of basic pay in fy, agency, age, grade, occCat, yearsEd combination
+# sumPay ....... sum of basic pay in fy, agency, age, grade, occCat, yearsEd combination (in 2011 $U.S.)
 
 # There is one record for each unique combination of fy, agency, age, grade, occCat, yearsEd combination
 # n and sumPay are aggregated within fy, agency, age, grade, occCat, yearsEd combinations
