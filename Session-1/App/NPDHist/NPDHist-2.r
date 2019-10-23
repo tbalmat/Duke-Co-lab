@@ -1,3 +1,5 @@
+# Duke University Co-lab Shiny Workshop, Session 1, October 2019
+
 # Shiny App
 # Generate a histogram from random normal values
 # Version 2, two reactive variables, modification of either causes update of plot
