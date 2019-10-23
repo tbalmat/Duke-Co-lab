@@ -45,7 +45,7 @@ setwd("C:\\Projects\\Duke\\Co-lab\\Shiny\\Session-1-NPDHist-CPDF\\App\\CPDF")
 # RStudio Cloud
 #setwd("/cloud/project/Duke-Co-lab/Shiny/Session-1-NPDHist-CPDF/App/CPDF")
 
-cpdf <<- read.table("CPDFAggregateDataBuzzfeed-Agency.csv", header=T, sep=",", strip.white=T)
+cpdf <<- read.table(gzfile("CPDFAggregateDataBuzzfeed-Agency.csv.gz"), header=T, sep=",", strip.white=T)
 
 # Compute mean pay per category (all employees in category assigned identical, mean, pay)
 cpdf[,"pay"] <<- cpdf[,"sumPay"]/cpdf[,"n"]
