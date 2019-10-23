@@ -1,3 +1,5 @@
+# Duke University Co-lab Shiny Workshop, Session 1, October 2019
+
 # Shiny App
 # Visually explore cross-sectional features of highly aggregated U.S. federal employee data
 # Version 1, R scripts to be converted to Shiny
@@ -5,7 +7,7 @@
 options(max.print=1000)      # number of elements, not rows
 options(stringsAsFactors=F)
 options(scipen=999999)
-options(device="windows")
+#options(device="windows")
 
 library(shiny)
 library(ggplot2)
@@ -32,8 +34,17 @@ library(ggplot2)
 # n and sumPay are aggregated within fy, agency, age, grade, occCat, yearsEd combinations
 #######################################################################################################
 
+#######################################################################################################
+# Read observations
+#######################################################################################################
+
+# Local
 setwd("C:\\Projects\\Duke\\Co-lab\\Shiny\\Session-1-NPDHist-CPDF\\App\\CPDF")
-cpdf <- read.table("CPDFAggregateDataBuzzfeed-Agency.csv", header=T, sep=",", strip.white=T)
+
+# RStudio Cloud
+#setwd("/cloud/project/Duke-Co-lab/Shiny/Session-1-NPDHist-CPDF/App/CPDF")
+
+cpdf <- read.table(gzfile("CPDFAggregateDataBuzzfeed-Agency.csv.gz"), header=T, sep=",", strip.white=T)
 
 # Compute mean pay per category (all employees in category assigned identical, mean, pay)
 cpdf[,"pay"] <- cpdf[,"sumPay"]/cpdf[,"n"]
@@ -173,12 +184,12 @@ diffVar <- "occCat"
 # Specify facet variable
 # One facet panel for each level of the variable will be generated
 # Specify NULL for no panels
-panelVar <- "grade"
+panelVar <- "yearsEd"
 panelRows <- NULL
 panelCols <- NULL
 
 # Aggregate mean of dependent var by independent var, differentiation var, and facet var
-depVar <- "age"
+depVar <- "sumPay"
 depVarMean <- paste("mean_", depVar, sep="")
 indepVar <- "fy"
 gdat <- aggregate(1:nrow(cpdf),
