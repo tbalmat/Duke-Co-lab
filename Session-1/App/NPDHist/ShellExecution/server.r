@@ -1,4 +1,6 @@
-# Shiny App
+# Duke University Co-lab Shiny Workshop, Session 1, October 2019
+
+# Shiny app server function
 # Generate a histogram from random normal values
 
 options(max.print=1000)      # number of elements, not rows

@@ -1,4 +1,6 @@
-# Shiny App
+# Duke University Co-lab Shiny Workshop, Session 1, October 2019
+
+# Shiny app user interface function
 # Generate a histogram from random normal values
 
 library(shiny)
