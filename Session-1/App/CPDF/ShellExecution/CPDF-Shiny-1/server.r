@@ -1,12 +1,13 @@
-# Shiny App
+# Duke University Co-lab Shiny Workshop, Session 1, October 2019
+
+# Shiny app server function
 # Visually explore cross-sectional features of highly aggregated U.S. federal employee data
 # Version 2, Shiny
-# Server function
 
 options(max.print=1000)      # number of elements, not rows
 options(stringsAsFactors=F)
 options(scipen=999999)
-options(device="windows")
+#options(device="windows")
 
 library(shiny)
 library(ggplot2)
