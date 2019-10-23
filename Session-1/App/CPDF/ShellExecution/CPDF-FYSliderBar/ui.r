@@ -1,12 +1,13 @@
-# Shiny App
+# Duke University Co-lab Shiny Workshop, Session 1, October 2019
+
+# Shiny app user interface function
 # Visually explore cross-sectional features of highly aggregated U.S. federal employee data
 # Version 3, Shiny with additional sliderBar control features
-# User interface
 
 options(max.print=1000)      # number of elements, not rows
 options(stringsAsFactors=F)
 options(scipen=999999)
-options(device="windows")
+#options(device="windows")
 
 library(shiny)
 
@@ -32,7 +33,17 @@ library(shiny)
 # n and sumPay are aggregated within fy, agency, age, grade, occCat, yearsEd combinations
 #######################################################################################################
 
+#######################################################################################################
+# Read observations, compute mean categorical employee pay, and populate selection lists
+# Create cpdf explicitly in the global environment, so that is is available to the Server function
+# Objects created here are accessible to the UI function, which is also declared in this script
+#######################################################################################################
+
+# Local
 setwd("C:\\Projects\\Duke\\Co-lab\\Shiny\\Session-1-NPDHist-CPDF\\App\\CPDF")
+
+# RStudio Cloud
+#setwd("/cloud/project/Duke-Co-lab/Shiny/Session-1-NPDHist-CPDF/App/CPDF")
 
 cpdf <<- read.table("CPDFAggregateDataBuzzfeed-Agency.csv", header=T, sep=",", strip.white=T)
 
@@ -40,6 +51,10 @@ cpdf <<- read.table("CPDFAggregateDataBuzzfeed-Agency.csv", header=T, sep=",", s
 cpdf[,"pay"] <<- cpdf[,"sumPay"]/cpdf[,"n"]
 
 agencyList <- c("all", sort(unique(cpdf[,"agency"])))
+
+#######################################################################################################
+# UI function
+#######################################################################################################
 
 shinyUI(
 
