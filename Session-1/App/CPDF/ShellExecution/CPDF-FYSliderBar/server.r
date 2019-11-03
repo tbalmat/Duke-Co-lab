@@ -17,16 +17,6 @@ shinyServer (
   function(input, output, session) {
 
     #########################################
-    # Configure initial startup flags
-    # On-screen elements referenced in a reactive context cause associated functions (observeEvent, etc.)
-    # to be executed during initial startup, when values are updated from NULL to default values
-    # Events should test whether user input or initial startup has caused execution
-    # Flags should be set to true during the startup execution 
-    #########################################
-
-    t1PlotSliderReactiveExec <- F 
-
-    #########################################
     # Configure common theme
     #########################################
 
@@ -68,7 +58,6 @@ shinyServer (
     # Display message function for tab 2
     t2DisplayMessage <- function(msg, color="black")
       output$t2Msg <- renderText({HTML(paste("<font color=", color, ">", msg, "</font>", "<br><br>Time:  ", Sys.time(), "</font>", sep=""))})
-
 
     # Clear message function for tab 2
     t2ClearMessage <- function()
@@ -267,65 +256,57 @@ shinyServer (
     # Tab 1 plot slider bar event
     # This function is triggered by a change in the vale of t1PlotSlider
     # The observations are subset and a corresponding plot is generated
-    # Execute only after initial trigger (when slider input changes from NULL to min value during startup)
+    # Execute only after initial trigger (when slider input changes from NULL to min value during startup), to
+    # avoid generation of a plot before any the plot button is used
     ####
 
-    observeEvent(input$t1PlotSlider, {
+    observeEvent(input$t1PlotSlider, ignoreInit=T, {
 
-      if(t1PlotSliderReactiveExec) {
+      #cat(input$t1PlotSlider)
 
-        #cat(input$t1PlotSlider)
+      t1ClearMessage()
 
-        t1ClearMessage()
+      # Copy prompt values to local variables
+      # These will be used in reactive functions to avoid immediate update on modification
+      depVar <- input$t1DepVar
+      indepVar <- input$t1IndepVar
+      agencyFilter <- input$t1AgencyFilter
+      diffVar <- input$t1DiffVar
+      graphType <- input$t1GraphType
+      pointSize <- input$t1PointSize
+      pointAlpha <- input$t1PointAlpha
+      panelVar <- input$t1PanelVar
+      panelRows <- input$t1PanelRows
+      panelCols <- input$t1PanelCols
+      fy <- input$t1PlotSlider
 
-        # Copy prompt values to local variables
-        # These will be used in reactive functions to avoid immediate update on modification
-        depVar <- input$t1DepVar
-        indepVar <- input$t1IndepVar
-        agencyFilter <- input$t1AgencyFilter
-        diffVar <- input$t1DiffVar
-        graphType <- input$t1GraphType
-        pointSize <- input$t1PointSize
-        pointAlpha <- input$t1PointAlpha
-        panelVar <- input$t1PanelVar
-        panelRows <- input$t1PanelRows
-        panelCols <- input$t1PanelCols
-        fy <- input$t1PlotSlider
+      # All parameter values should be validated before proceeding
+      errMsg <- ""
+      if(depVar==indepVar)
+        errMsg <- "dependent and independent variables must be different"
 
-        # All parameter values should be validated before proceeding
-        errMsg <- ""
-        if(depVar==indepVar)
-          errMsg <- "dependent and independent variables must be different"
-
-        if(errMsg=="") {
-          # Filter and aggregate observations
-          gdat <- t1FiltAggData(cpdf, agencyFilter=agencyFilter, fyFilter=fy, depVar=depVar, indepVar=indepVar,
-                                diffVar=diffVar, panelVar=panelVar)
-          # Generate and render plot
-          # Specify static y-axis limits so that animated plots appear with constant reference axis
-          if(depVar=="pay") {
-            yLim <- c(0, 120000)
-          } else if(depVar=="age") {
-            yLim <- c(15, 70)
-          } else if(depVar=="yearsEd") {
-            yLim <- c(10, 20)
-          } else if(depVar=="grade") {
-            yLim <- c(2, 12)
-          } else {
-            yLim <- c(NULL, NULL)
-          }
-          output$t1Plot <- renderPlot(t1ComposePlot(gdat[["aggDat"]], graphType, diffVar, indepVar, gdat[["depVarMean"]],
-                                                    pointSize, pointAlpha, panelVar, panelRows, panelVar, yLim, pointVar="n"))
+      if(errMsg=="") {
+        # Filter and aggregate observations
+        gdat <- t1FiltAggData(cpdf, agencyFilter=agencyFilter, fyFilter=fy, depVar=depVar, indepVar=indepVar,
+                              diffVar=diffVar, panelVar=panelVar)
+        # Generate and render plot
+        # Specify static y-axis limits so that animated plots appear with constant reference axis
+        if(depVar=="pay") {
+          yLim <- c(0, 120000)
+        } else if(depVar=="age") {
+          yLim <- c(15, 70)
+        } else if(depVar=="yearsEd") {
+          yLim <- c(10, 20)
+        } else if(depVar=="grade") {
+          yLim <- c(2, 13)
         } else {
-          output$t1Plot <- renderPlot(NULL)
-          t1DisplayMessage(errMsg, "red")
+          yLim <- c(NULL, NULL)
         }
-
+        output$t1Plot <- renderPlot(t1ComposePlot(gdat[["aggDat"]], graphType, diffVar, indepVar, gdat[["depVarMean"]],
+                                                  pointSize, pointAlpha, panelVar, panelRows, panelVar, yLim, pointVar="n"))
       } else {
-
-        # Flag event as executed after startup
-        t1PlotSliderReactiveExec <<- T
-
+        output$t1Plot <- renderPlot(NULL)
+        t1DisplayMessage(errMsg, "red")
       }
 
     })
