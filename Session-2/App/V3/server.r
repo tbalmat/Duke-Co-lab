@@ -404,8 +404,8 @@ shinyServer(
 
 
     #######################################################################################################
-    # Action for table row selection
-    # Render box plot for subset of observations corresponding to selected table row
+    # Action for table cell selection
+    # Render box plot for subset of observations corresponding to row of selected cell
     #######################################################################################################
 
     observeEvent(
