@@ -127,7 +127,7 @@ colnames(aggdat) <- c(indepVar, "n", "mean", "q25", "q50", "q75")
 #######################################################################################################
 
 # Specify dependent (numeric) variable
-depVar <- c("Grade", "Age", "EducationYears", "BasicPay")[2]
+depVar <- c("Grade", "Age", "EducationYears", "BasicPay")[1]
 
 # Specify independent aggregation variable(s)
 indepVar <- c("FY", "Grade", "Age", "EducationYears", "Agency", "OccupationalCategory", "Occupation")[c(5, 7)]
@@ -255,7 +255,7 @@ if(pointDisplay) {
     # Note that jitter points are the last layer to have been added
     # Note, also, the required spelling of "colour" ("color" causes contention between two color scales during render)
     g[["layers"]][[length(g[["layers"]])]][["mapping"]][["colour"]] <- aes_string(color=diffVar)[[1]]
-    g <- g + scale_color_manual(values=colorRampPalette(c("blue", "red"))(length(unique(gdat[,diffVar]))))
+    g <- g + scale_color_manual(name=diffVar, values=colorRampPalette(c("blue", "red"))(length(unique(gdat[,diffVar]))))
   }
 }
 
