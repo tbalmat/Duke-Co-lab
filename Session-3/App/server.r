@@ -1,5 +1,5 @@
 #####################################################################################################
-# Duke University Co-lab Shiny Workshop, Session 3, November 2019
+# Duke University Co-lab Shiny Workshop, Session 4, November 2019
 # U.S. Domestic Flight Evalution
 # Shiny server script
 #####################################################################################################
@@ -8,15 +8,16 @@ options(stringsAsFactors=F)
 options(scipen=999999)
 
 library(shiny)
+library(plotly)
 
 # Set current working directory
 # Local
-setwd("C:/Projects/Duke/Co-lab/Shiny/Session-3-ggplot")
+setwd("C:/Projects/Duke/Co-lab/Shiny")
 # Rstudio Cloud dir
-#setwd("/cloud/project/Duke-Co-lab/Shiny/Session-3-ggplot")
+#setwd("/cloud/project/Duke-Co-lab/Shiny")
 
 # Import flight evaluation functions
-source("App/FlightEvaluation-Functions.r", echo=F)
+source("Session-4-plotly/App/FlightEvaluation-plotly-Functions.r", echo=F, local=T)
 
 # Server function
 shinyServer(
@@ -34,8 +35,10 @@ shinyServer(
     agg <- function(aggVar, carrierDelay, includeCancel) {
       # Ignore if data not yet available (typically on program initialization)
       if(exists("fldat")) {
+        # Subset to include carrier delays and cancellations, as requested
+        k <- which((fldat[,"CarrierDelay"]>0 | !carrierDelay) & (fldat[,"Cancelled"]==0 | includeCancel))
         cat("agg0\n")
-        fldatb <<- aggfdat01(fldat, aggVar, apdat, carrierDelay, includeCancel)
+        fldatb <<- aggfdat01(fldat[k,], aggVar,  apdat)
         cat("agg1\n")
       }
     }
@@ -120,16 +123,18 @@ shinyServer(
         }
 
         # Render plot
+        g <- ggplotly(composePlotMap01(fldatb[kflgtp,], colorRange, colorScaleMid, sizeRange,
+                                       alphaRange, aplab, facetVar, facetLabel, facetRows),
+                      width=gwidth, height=gheight)
         progress <- shiny::Progress$new()
         progress$set(message="composing plot", value=1)
-        output$plotUSFlights <- renderPlot({# Enable progress indicator
-                                            progress <- shiny::Progress$new()
-                                            on.exit(progress$close())
-                                            progress$set(message="composing plot", value=1)
+        output$plotUSFlights <- renderPlotly(# Enable progress indicator
+                                            #progress <- shiny::Progress$new()
+                                            #on.exit(progress$close())
+                                            #progress$set(message="composing plot", value=1)
                                             # Render plot
-                                            print(composePlotMap01(fldatb[kflgtp,], colorRange, colorScaleMid, sizeRange,
-                                                                   alphaRange, aplab, facetVar, facetLabel, facetRows))},
-                                            width=gwidth, height=gheight)
+                                            print(g))
+                                            #width=gwidth, height=gheight)
         progress$close()
 
         cat("graph-map-1\n")
@@ -203,7 +208,7 @@ shinyServer(
     # fail to execute changes even after data are loaded in the observe event)
     # Explicit load of data resolves the issue and all reactive elements behave normally
     cat("Read0\n")
-    readData("SampleData")
+    readData("Session-3-ggplot/SampleData")
     cat("Read1\n")
 
     # Set default data directory and output directory locations
