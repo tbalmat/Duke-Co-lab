@@ -72,7 +72,7 @@ t1ComposePlot1 <- function(data, ylim, xyHighlight=NULL) {
   if(!is.null(xyHighlight))
     g <- g + geom_point(data=xyHighlight, aes(x=phenotype, SNP=SNP, y=log_10_p), size=3, color="red", alpha=1)
 
-  # Finish hit
+  # Finish it
   g <- g +
   scale_y_continuous(limits=ylim, label=function(y) round(y, 2)) +
   theme(panel.background=element_blank(),
