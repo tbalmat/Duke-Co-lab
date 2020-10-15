@@ -1,4 +1,4 @@
-# Duke University Co-lab Shiny Workshop, Session 1, October 2019
+# Duke University Co-lab Shiny Workshop, Session 1, Spring 2020
 
 # Shiny App
 # Generate a histogram from random normal values
@@ -31,7 +31,6 @@ ui <- function(req) {
 
    fluidPage(
 
-      HTML("<br><b>Duke University Co-lab - Hello Shiny!<br><br>Generate Random, Normally Distributed Values</b><br><br>"),
       HTML("<br><b>Duke University Co-lab - Hello Shiny!<br><br>Generate Random, Normally Distributed Values</b><br><br>"),
       
       # Prompt

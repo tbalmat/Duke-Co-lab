@@ -1,4 +1,4 @@
-# Duke University Co-lab Shiny Workshop, Session 1, October 2019
+# Duke University Co-lab Shiny Workshop, Session 1, Spring 2020
 
 # Shiny App
 # Visually explore cross-sectional features of highly aggregated U.S. federal employee data

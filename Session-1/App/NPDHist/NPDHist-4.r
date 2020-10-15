@@ -1,4 +1,4 @@
-# Duke University Co-lab Shiny Workshop, Session 1, October 2019
+# Duke University Co-lab Shiny Workshop, Session 1, Spring 2020
 
 # Shiny App
 # Generate a histogram from random normal values
@@ -102,6 +102,7 @@ ui <- function(req) {
 
 # Function to generate either a ggplot object or NULL if standard deviation non-positive
 npdPlot <- function(n, w, mn, sd, barColor, dispCurve, curveColor) {
+  cat("AAA\n", file=stderr())
   if(sd>0) {
     g <- ggplot() +
       # Bars
@@ -178,3 +179,5 @@ server <- function(input, output, session) {
 
 # Execute
 runApp(list("ui"=ui, "server"=server), launch.browser=T)
+?shiny
+

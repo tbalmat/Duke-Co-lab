@@ -1,4 +1,4 @@
-# Duke University Co-lab Shiny Workshop, Session 1, October 2019
+# Duke University Co-lab Shiny Workshop, Session 1, Spring 2020
 
 # Shiny App
 # Generate a histogram from random normal values
@@ -50,7 +50,7 @@ ui <- function(req) {
             HTML("<br>"),
             sliderInput("w", "bar width", min=0, max=1, step=0.01, value=0.5, width="100%"),
             HTML("<br>"),
-            numericInput("mean", "mean", value=0),
+            numericInput("mean", "mean", value=0, step=0.25),
             HTML("<br>"),
             numericInput("sd", "Standard deviation", min=0, value=1)
           )

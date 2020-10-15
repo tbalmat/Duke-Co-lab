@@ -101,7 +101,7 @@ shinyUI(
               # Button to trigger plot generation
               actionButton(inputId="t1ActionPlot", label="plot", style="color:white; background:linear-gradient(#54b4eb, #2fa4e7 60%, #0088dd)")
             )
-          ),
+          ),  
           # Graph and message line
           column(width=10,
             HTML("<br><br><br><br><br><br>"),

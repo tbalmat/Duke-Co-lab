@@ -1,4 +1,4 @@
-# Duke University Co-lab Shiny Workshop, Session 1, October 2019
+# Duke University Co-lab Shiny Workshop, Session 1, Spring 2020
 
 # Launch app defined in ui.r and server.r in specified appDir
 # Note the specification of a tcp port that the process will listen on for http requests
