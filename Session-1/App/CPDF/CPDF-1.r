@@ -278,7 +278,7 @@ if(!is.null(panelVar))
   g <- g + facet_wrap(panelVar, nrow=panelRows, ncol=panelCols,
                       labeller=as_labeller(function(x) paste(panelVar, " = ", x, sep="")))
 
-# Configure axis labes and apply theme
+# Configure axis labels and apply theme
 g <- g +  ggTheme +
   labs(x=paste("\n", indepVar, sep=""), y="P<sub>mass</sub>\n")
 
