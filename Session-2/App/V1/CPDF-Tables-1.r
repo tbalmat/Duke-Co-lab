@@ -208,7 +208,7 @@ print(g)
 #######################################################################################################
 
 # Specify row of subset to plot
-aggrow <- 13
+aggrow <- 1
 
 # Retrieve subset indices
 k <- iagg[aggrow,"k"][[1]]
