@@ -85,9 +85,18 @@ shinyUI(
     #useShinyjs(),
     includeCSS("App/V2/style.css"),
 
+    title="OPM Analysis",
+
+    # Reposition and alter appearance of notification window
+    tags$head(
+      tags$style(
+        HTML(".shiny-notification {font-size:20px; color:red; font-style:bold; width:50%; position:fixed; top:calc(50%); left:calc(25%)}")
+        )
+    ),
+
     div(
 
-      HTML("<H2>Duke University Co-lab Shiny Workshop</H2><br>"),
+      HTML("<H2>Duke University Co-lab Shiny Workshop!</H2><br>"),
       HTML("<H3>OPM Human Capital Overview</H3>"),
       HTML("<br><br>"),
 
