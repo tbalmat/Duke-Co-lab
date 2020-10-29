@@ -1,20 +1,16 @@
 #####################################################################################################
-# Duke University Co-lab Shiny Workshop, Session 3, November 2019
-# U.S. Domestic Flight Evalution
+# Duke University Co-lab Shiny Workshop, Session 3, October 2020
+# U.S. Domestic Flight Evalution App
 # Functions
 #####################################################################################################
-
-# Configure labels for month and weekday codes
-monthLabel <<- c("1"="Jan", "2"="Feb", "3"="Mar", "4"="Apr", "5"="May", "6"="Jun",
-                "7"="Jul", "8"="Aug", "9"="Sep", "10"="Oct", "11"="Nov", "12"="Dec")
-weekdayLabel <<- c("1"="Mon", "2"="Tue", "3"="Wed", "4"="Thu", "5"="Fri", "6"="Sat", "7"="Sun")
-
 
 ###############################################################################################################
 #### Function:  Read source data files (all zip files in FlightData directory)
 ###############################################################################################################
 
 readData <- function(dirDat) {
+
+  cat("Read-0\n")
 
   # Flight data
   # Restrict columns used
@@ -51,7 +47,7 @@ readData <- function(dirDat) {
   # Configure airline labels 
   alLabel <<- setNames(paste(aldat[,"carrier_name"], " (", aldat[,"carrier"], ")", sep=""), rownames(aldat))
 
-  # Resd airport data, including lat and long
+  # Read airport data, including lat and long
   apdat <<- read.table(paste(dirDat, "/77765270_T_MASTER_CORD.csv", sep=""), header=T, sep=",")
   colnames(apdat) <<- tolower(colnames(apdat))
   apdat <<- apdat[which((apdat[,"airport_id"] %in% unique(fldat[,"OriginAirportID"]) |
@@ -59,62 +55,69 @@ readData <- function(dirDat) {
                   c("airport_id", "airport", "display_airport_name", "display_airport_city_name_full",
                     "airport_state_code", "latitude", "longitude", "utc_local_time_variation")]
 
-}
+  cat("Read-1\n")
 
+}
 
 ###############################################################################################################
 #### Function:  Aggregate proportion flights by origin and destination within aggVar (typically month or weekday)
 #### Limit to carrier delayed flights if requested
 ###############################################################################################################
 
-aggfdat01 <- function(data, aggVar, apdat, carrierDelay=F, includeCancel=F) {
+aggfdat <- function(aggVar, carrierDelay, includeCancel) {
 
+  cat("agg-0\n")
   progress <- shiny::Progress$new()
   progress$set(message="aggregating", value=0.5)
 
-  # Aggregate within specified aggVar
-  if(aggVar!="") {
-    fd <- do.call(rbind,
-                  apply(as.matrix(unique(data[,aggVar])), 1,
-                    function(x) {
-                      k <- which(data[,aggVar]==x & (data[,"CarrierDelay"]>0 | !carrierDelay) & (data[,"Cancelled"]==0 | includeCancel))
-                      if(length(k)>0) {
-                        fd <- aggregate(rep(1, length(k)), by=list(data[k,"OriginAirportID"], data[k,"DestAirportID"]), sum)
-                        fd <- data.frame(x, fd[,1:2], fd[,3]/length(k))
-                      } else {
-                        fd <- data.frame(character(), numeric(), numeric(), numeric())
-                      }
-                      return(setNames(fd, c(aggVar, "OriginAirportID", "DestAirportID", "p")))
-                    }))
-  } else {
-    k <- which((data[,"CarrierDelay"]>0 | !carrierDelay) & (data[,"Cancelled"]==0 | includeCancel))
-    if(length(k)>0) {
-      fd <- aggregate(rep(1, length(k)), by=list(data[k,"OriginAirportID"], data[k,"DestAirportID"]), sum)
-      fd[,3] <- fd[,3]/length(k)
+  if(nrow(fldat)>0) {
+
+    # Subset to include carrier delays and cancellations, as requested
+    k0 <- which((fldat[,"CarrierDelay"]>0 | !carrierDelay) & (fldat[,"Cancelled"]==0 | includeCancel))
+
+    if(length(k0)>0) {
+
+      # Aggregate within levels of specified aggregation var
+      if(aggVar!="") {
+        fd <- do.call(rbind,
+                      apply(as.matrix(unique(fldat[k0,aggVar])), 1,
+                        function(x) {
+                          k1 <- k0[which(fldat[k0,aggVar]==x)]
+                          fd <- aggregate(k1, by=list(fldat[k1,"OriginAirportID"], fldat[k1,"DestAirportID"]), length)
+                          # Compute proportion of all flights by aggregation var, origin, and destination
+                          return(setNames(data.frame(x, fd[,1:2], fd[,3]/length(k1)),
+                                          c(aggVar, "OriginAirportID", "DestAirportID", "p")))
+                        }))
+      } else {
+        fd <- aggregate(k0, by=list(fldat[k0,"OriginAirportID"], fldat[k0,"DestAirportID"]), length)
+        fd[,3] <- fd[,3]/length(k0)
+        colnames(fd) <- c("OriginAirportID", "DestAirportID", "p")
+      }
+
+      progress$set(message="merge origin airport", value=0.75)
+
+      # Join flight origin airport to lat and long data
+      fd <- merge(fd, apdat[,c("airport_id", "airport", "latitude", "longitude")], by.x="OriginAirportID", by.y="airport_id")
+      colnames(fd)[which(colnames(fd) %in% c("airport", "latitude", "longitude"))] <- c("airportOrigin", "latitudeOrigin", "longitudeOrigin")
+
+      progress$set(message="merge destination airport", value=1)
+
+      # Join flight destination airport to lat and long data
+      fd <- merge(fd, apdat[,c("airport_id", "airport", "latitude", "longitude")], by.x="DestAirportID", by.y="airport_id")
+      colnames(fd)[which(colnames(fd) %in% c("airport", "latitude", "longitude"))] <- c("airportDest", "latitudeDest", "longitudeDest")
+
     } else {
-      fd <- data.frame(character(), numeric(), numeric(), numeric())
+      fd <- data.frame()
     }
-    colnames(fd) <- c("OriginAirportID", "DestAirportID", "p")
+  } else {
+    fd <- data.frame()
   }
 
-  progress$set(message="merge origin airport", value=0.75)
-
-  # Join flight origin airport to lat and long data
-  fd <- merge(fd, apdat[,c("airport_id", "airport", "latitude", "longitude")], by.x="OriginAirportID", by.y="airport_id")
-  colnames(fd)[which(colnames(fd) %in% c("airport", "latitude", "longitude"))] <- c("airportOrigin", "latitudeOrigin", "longitudeOrigin")
-
-  progress$set(message="merge destination airport", value=1)
-
-  # Join flight destination airport to lat and long data
-  fd <- merge(fd, apdat[,c("airport_id", "airport", "latitude", "longitude")], by.x="DestAirportID", by.y="airport_id")
-  colnames(fd)[which(colnames(fd) %in% c("airport", "latitude", "longitude"))] <- c("airportDest", "latitudeDest", "longitudeDest")
-
   progress$close()
-
+  cat("agg-1\n")
   return(fd)
 
 }
-
 
 ###############################################################################################################
 #### Function:  Plot flights from origin to destination on map of the continental U.S.
@@ -123,16 +126,48 @@ aggfdat01 <- function(data, aggVar, apdat, carrierDelay=F, includeCancel=F) {
 #### Size, color, and alpha scales specified in sizeRange, colorRange, colorScaleMid, and alphaRange
 ###############################################################################################################
 
-composePlotMap01 <- function(fldat, colorRange=c("blue", "green", "red"), colorScaleMid=NA,
-                             sizeRange=c(0.25, 2), alphaRange=c(0.25, 0.85), airportLab, facetVar="",
-                             facetLabel="", facetRows=NULL, ttl="", subttl="", xlab="", ylab="") {
+composePlotMap <- function(pthreshFlight, pthreshAirportLabel, colorRange=c("blue", "green", "red"),
+                           colorScaleMid=NA, sizeRange=c(0.25, 2), alphaRange=c(0.25, 0.85),
+                           facetVar="", facetLabel="", facetRows=NULL, ttl="", subttl="", xlab="", ylab="") {
 
   library(ggplot2)
   library(ggrepel)
 
+  cat("graph-map-0\n")
+  progress <- shiny::Progress$new()
+  progress$set(message="composing flight map", value=1)
+
+  # Restrict flights to proportion >= p-threshold
+  kflgtp <- which(fldatb[,"p"]>pthreshFlight)
+
+  # Compose unique list of airports with proportion flights above label threshold
+  klab <- kflgtp[which(fldatb[kflgtp,"p"]>pthreshAirportLabel)]
+  if(length(klab)>0) {
+    if(facetVar!="") {
+      # Compose within facet var and retain facet var value, so that sets are produced for each facet level
+      aplab <- aggregate(klab, by=list(fldatb[klab,facetVar]),
+                 function(k) {
+                   # Assemble vector of unique airports and retrieve associated lat and long
+                   ap <- unique(c(fldatb[k,"OriginAirportID"], fldatb[k,"DestAirportID"]))
+                   return(apdat[which(apdat[,"airport_id"] %in% ap),c("airport", "latitude", "longitude")])
+                 })
+      aplab <- do.call(rbind,
+                       apply(as.matrix(1:nrow(aplab)), 1,
+                         function(i) data.frame(aplab[i,1], aplab[i,2][[1]], aplab[i,2][[2]], aplab[i,2][[3]])))
+      colnames(aplab) <- c(facetVar, "airport", "latitude", "longitude")
+    } else {
+      # Compose within entire set of flights, since grouping (faceting) not requested
+      # Assemble vector of unique airports and retrieve associated lat and long
+      ap <- unique(c(fldatb[klab,"OriginAirportID"], fldatb[klab,"DestAirportID"]))
+      aplab <- apdat[which(apdat[,"airport_id"] %in% ap),c("airport", "latitude", "longitude")]
+    }
+  } else {
+    aplab <- data.frame("airport"=character(), "latitude"=numeric(), "longitude"=numeric())
+  }
+
   # Compute mid-point of color scale as mean proportion, if not specified
   if(is.na(colorScaleMid))
-    colorScaleMid <- mean(fldat[,"p"])
+    colorScaleMid <- mean(fldatb[kflgtp,"p"])
 
   # Initialize plot
   g <- ggplot() +
@@ -141,7 +176,7 @@ composePlotMap01 <- function(fldat, colorRange=c("blue", "green", "red"), colorS
        # Include arcs connecting each unique pair of flight origins and destinations
        # Note that the arc color, size, and transparency are a function of the proportion of flights within aggegation (facet) var
        # Because these appeaer in the aes() call, ggplot will assign a unique color, size, and alpha to segmented ranges of proportions
-       geom_curve(data=fldat,
+       geom_curve(data=fldatb[kflgtp,],
                   aes(x=longitudeOrigin, xend=longitudeDest, y=latitudeOrigin, yend=latitudeDest, color=p, size=p, alpha=p),
                   curvature=0.1, arrow=arrow(angle=20, length=unit(0.1, "in"), type="closed")) +
        # Define arc color, size, and alpha ranges for aesthetic and legend assignment
@@ -152,8 +187,8 @@ composePlotMap01 <- function(fldat, colorRange=c("blue", "green", "red"), colorS
   # Include airport labels, if present
   # Note the use of repel to prevent labels from overlapping
   # Each label is given unique text (airport name), since label appears in the aes() call
-  if(nrow(airportLab)>0)
-    g <- g + geom_label_repel(data=airportLab, aes(x=longitude, y=latitude, label=airport),
+  if(nrow(aplab)>0)
+    g <- g + geom_label_repel(data=aplab, aes(x=longitude, y=latitude, label=airport),
                               size=3, angle=0, direction="both", label.padding = 0.2, alpha=0.65)
 
   # Facet by specified variable
@@ -186,21 +221,26 @@ composePlotMap01 <- function(fldat, colorRange=c("blue", "green", "red"), colorS
                  legend.title=element_text(size=12)) +
            labs(title=ttl, subtitle=subttl, x=xlab, y=ylab)
 
-  # Order up!
+  progress$close()
+  cat("graph-map-1\n")
+
   return(g)
 
 }
-
 
 ###############################################################################################################
 #### Function:  Plot density ridges of carrier or arrival delay
 ###############################################################################################################
 
-composePlotDensity01 <- function(fldat, aldat, x, xlim=c(-200, 200), y, yOrder="",
-                                 yFillColor=c("dodgerblue4", "gold3"), reverseFillColor=F, fillAlpha=0.5,
-                                 facetVar="", facetLabel="", facetRows=NULL, vline="", ttl="", subttl="") {
+composePlotDensity <- function(x, xlim=c(-200, 200), y, yOrder="",
+                               yFillColor=c("dodgerblue4", "gold3"), reverseFillColor=F, fillAlpha=0.5,
+                               facetVar="", facetLabel="", facetRows=NULL, vline="", ttl="", subttl="") {
 
   library(ggridges)
+
+  cat("graph-dens-0\n")
+  progress <- shiny::Progress$new()
+  progress$set(message="composing density plot", value=1)
 
   # Omit cancellations and limit to delayed flights if requested
   # Compose graph data set (independent var, x)
@@ -340,6 +380,9 @@ composePlotDensity01 <- function(fldat, aldat, x, xlim=c(-200, 200), y, yOrder="
     colnames(lines) <- c("facetVar", "group", "x", "y0", "y1")
     g <- g + geom_segment(data=lines, aes(x=x, xend=x, y=y0, yend=y0+y1), size=0.65)
   }
+
+  progress$close()
+  cat("graph-dens-1\n")
 
   return(g)
 

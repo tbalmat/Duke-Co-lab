@@ -4,10 +4,63 @@
 # Shiny user interface script
 #####################################################################################################
 
+# Information on shiny available at:
+# https://shiny.rstudio.com/
+# https://github.com/rstudio/shiny
+# https://cran.r-project.org/web/packages/shiny/shiny.pdf
+
+#######################################################################################################
+# Prepare and display plots of the distribution of domestic flights originating and terminating in the
+# continental United States
+#
+# The first plot connects flight origin and destination using an arc with size, color, and transparency
+# as a function of proportion of all flights
+#
+# The second plot displays the distribution of density of flights by minutes of delay in departure due
+# to carrier or arrival delay minus departure delay (to measure effectiveness of crew ability to
+# compensate for departure delay)
+# 
+# Flight map customization features include
+# Filtering of flights based on proportion of overall flights (minimum threshold, to eliminate low volume routes)
+# Limiting flights to those classified as delayed due to carrier reasons
+# Inclusion of canceled flights
+# Paneling (individual plots) by weekday, month, carrier, or no panel
+# Adjustment of arc size, color, and transparency by upper and/or lower proportion thresholds
+# Display of airport labels with minimum proportion threshold
+#
+# Density plot customization features include
+# x-axis variable specification (carrier delay, arrival-departure delay)
+# y-axis variable specification (one distribution for each weekday, month, or carrier)
+# Reordering of y-axis ridges by natural order (weekday, month, carrier), mean, or median of ridge distributions
+# Paneling by weekday, month, or carrier
+# Display of a vertical line at the means or medians of each distribution or at zero (crew goal)
+# Lower and upper limits on x-axis
+# Adjustment of distribution color and transparency
+#
+# Data source:  U.S. Bureau of Transportation Statistics Carrier On-Time Performance Data:
+# https://www.transtats.bts.gov/ONTIME/
+# https://www.transtats.bts.gov/Fields.asp 
+#
+# For this app, a fifty percent random sample of flights recorded in January, April, July, and October of 2018
+# observations are used.  Columns retained from those made available by BTS are FlightDate, Month, DayOfWeek,
+# DOT_ID_Reporting_Airline, OriginAirportID, DestAirportID, DepDelay, ArrDelay, Cancelled, CarrierDelay,
+# OriginState, and DestState.  Additional information on BTS column definitions is available at https://www.transtats.bts.gov/Fields.asp
+#######################################################################################################
+
 library(shiny)
 
 shinyUI(
   fluidPage(
+
+    # Set browser tab title
+    title="U.S. Flight Data",
+
+    # Reposition and alter appearance of notification window
+    tags$head(
+      tags$style(
+        HTML(".shiny-notification {font-size:20px; color:black; font-style:bold; width:50%; position:fixed; top:calc(50%); left:calc(25%)}")
+        )
+    ),
 
     div(HTML("<h3>Duke University U.S. Domestic Flight Analysis (Bureau of Transportation Statistics 2018 Data)</h3><br>"),
         style="margin-left: 20px"
@@ -18,7 +71,7 @@ shinyUI(
       fluidRow(width=12,
         tabsetPanel(id="flightTabs",
 
-          # Tab 1:  Continental U.S. map with flight routes diaplayed
+          # Tab 1:  Continental U.S. map with flight routes displayed
           tabPanel("Flight Map",
             # Prompt
             HTML("<br>"),
@@ -98,7 +151,7 @@ shinyUI(
               div(selectInput("densFillColor1", "Color Low", choices=c("Red", "Blue", "Green", "Gold"), selected="Blue", multiple=F),
                   style="display: inline-block; width: 100px; vertical-align: top; margin-left: 20px; margin-top: 15px"
               ),
-              div(selectInput("densFillColor2", "Color High", choices=c("Red", "Blue", "Green", "Gold"), selected="Gold", multiple=F),
+              div(selectInput("densFillColor2", "Color High", choices=list("dark"=c("Red", "Blue"), "bright"=c("Green", "Gold")), selected="Gold", multiple=F),
                   style="display: inline-block; width: 100px; vertical-align: top; margin-left: 20px; margin-top: 15px"
               ),
               div(checkboxInput("densReverseFillColor", "Reverse Color", value=F),
@@ -126,6 +179,8 @@ shinyUI(
               HTML("</center>")
             )
           ),
+
+          # Panel three, data file location
           tabPanel("Data/Directories",
             HTML("<br>"),
             fluidRow(width=12,

@@ -1,6 +1,6 @@
 #####################################################################################################
-# Duke University Co-lab Shiny Workshop, Session 4, November 2019
-# U.S. Domestic Flight Evalution
+# Duke University Co-lab Shiny Workshop, Session 3, October 2020
+# U.S. Domestic Flight Evalution App
 # Shiny server script
 #####################################################################################################
 
@@ -8,96 +8,35 @@ options(stringsAsFactors=F)
 options(scipen=999999)
 
 library(shiny)
-library(plotly)
 
 # Set current working directory
 # Local
-setwd("C:/Projects/Duke/Co-lab/Shiny")
+setwd("C:/Projects/Duke/Co-lab/Shiny-Fall-2020/Session-3-ggplot")
 # Rstudio Cloud dir
-#setwd("/cloud/project/Duke-Co-lab/Shiny")
+#setwd("/cloud/project/Duke-Co-lab/Shiny/Session-3-ggplot")
 
 # Import flight evaluation functions
-source("Session-4-plotly/App/FlightEvaluation-plotly-Functions.r", echo=F, local=T)
+source("App/FlightEvaluation-Functions.r", echo=F)
+
+# Set global variables
+# Configure labels for month and weekday codes
+monthLabel <<- c("1"="Jan", "2"="Feb", "3"="Mar", "4"="Apr", "5"="May", "6"="Jun",
+                 "7"="Jul", "8"="Aug", "9"="Sep", "10"="Oct", "11"="Nov", "12"="Dec")
+weekdayLabel <<- c("1"="Mon", "2"="Tue", "3"="Wed", "4"="Thu", "5"="Fri", "6"="Sat", "7"="Sun")
 
 # Server function
 shinyServer(
   function(input, output, session) {
 
-    # Data retrieval button event
-    observeEvent(input$retrieveData, {
-      cat("Read0\n")
-      readData(input$dirDat)
-      cat("Read1\n")
-      fldatb <<- agg(input$aggVar, input$carrierDelay, input$includeCancel)
-    })
+    ##############################################################################################################
+    # Function:  Render flight map
+    ##############################################################################################################
 
-    # Aggregate flights
-    agg <- function(aggVar, carrierDelay, includeCancel) {
-      # Ignore if data not yet available (typically on program initialization)
-      if(exists("fldat")) {
-        # Subset to include carrier delays and cancellations, as requested
-        k <- which((fldat[,"CarrierDelay"]>0 | !carrierDelay) & (fldat[,"Cancelled"]==0 | includeCancel))
-        cat("agg0\n")
-        fldatb <<- aggfdat01(fldat[k,], aggVar,  apdat)
-        cat("agg1\n")
-      }
-    }
+    graphFlightMap <- function(pthreshFlight, pthreshAirportLabel, colorRange, colorScaleMid, sizeRange,
+                               alphaRange, facetVar, carrierDelay) {
 
-    # Monitor controls that affect aggregation for map generation
-    observe({
-      # Capture reactive values
-      # This forces execution of instructions whenever any one variable changes value
-      facetVar <- input$facetVar
-      carrierDelay <- input$carrierDelay
-      includeCancel <- input$includeCancel
-      agg(facetVar, carrierDelay, includeCancel)
-    })
-
-    # Compose and render flight map when reactive values change
-    observe({
-
-      # Record reactive values
-      # Assignment forces execution of instructions whenever any one variable changes value
-      pthreshFlight <- input$pthreshFlight
-      pthreshAirportLabel <- input$pthreshAirportLabel
-      colorRange <- c(input$color1, input$color2, input$color3)
-      colorScaleMid <- input$colorScaleMid
-      sizeRange <- input$sizeRange
-      alphaRange <- input$alphaRange
-      facetVar <- input$facetVar
-      carrierDelay <- input$carrierDelay
-
-      # Ignore if no flight data available (typically on program initialization)
+      # Ignore if no aggregated flight data available (typically on program initialization)
       if(exists("fldatb")) {
-        cat("graph-map-0\n")
-
-        # Restrict flights to proportion >= p-threshold
-        kflgtp <- which(fldatb[,"p"]>pthreshFlight)
-
-        # Compose unique list of airports with proportion flights above label threshold
-        k <- which(fldatb[,"p"]>pthreshAirportLabel)
-        if(length(k)>0) {
-          if(facetVar!="") {
-            # Compose within facet var and retain facet var value, so that sets are produced for each facet level
-            aplab <- aggregate(k, by=list(fldatb[k,facetVar]),
-                       function(k) {
-                         # Assemble vector of unique airports and retrieve associated lat and long
-                         ap <- unique(c(fldatb[k,"OriginAirportID"], fldatb[k,"DestAirportID"]))
-                         return(apdat[which(apdat[,"airport_id"] %in% ap),c("airport", "latitude", "longitude")])
-                       })
-            aplab <- do.call(rbind,
-                             apply(as.matrix(1:nrow(aplab)), 1,
-                               function(i) data.frame(aplab[i,1], aplab[i,2][[1]], aplab[i,2][[2]], aplab[i,2][[3]])))
-            colnames(aplab) <- c(facetVar, "airport", "latitude", "longitude")
-          } else {
-            # Compose within entire set of flights, since grouping (faceting) not requested
-            # Assemble vector of unique airports and retrieve associated lat and long
-            ap <- unique(c(fldatb[k,"OriginAirportID"], fldatb[k,"DestAirportID"]))
-            aplab <- apdat[which(apdat[,"airport_id"] %in% ap),c("airport", "latitude", "longitude")]
-          }
-        } else {
-          aplab <- data.frame("airport"=character(), "latitude"=numeric(), "longitude"=numeric())
-        }
 
         # Configure facet labels and rows and plot height and width based on faceting variable
         if(facetVar=="Month") {
@@ -123,55 +62,40 @@ shinyServer(
         }
 
         # Render plot
-        g <- ggplotly(composePlotMap01(fldatb[kflgtp,], colorRange, colorScaleMid, sizeRange,
-                                       alphaRange, aplab, facetVar, facetLabel, facetRows),
-                      width=gwidth, height=gheight)
-        progress <- shiny::Progress$new()
-        progress$set(message="composing plot", value=1)
-        output$plotUSFlights <- renderPlotly(# Enable progress indicator
-                                            #progress <- shiny::Progress$new()
-                                            #on.exit(progress$close())
-                                            #progress$set(message="composing plot", value=1)
-                                            # Render plot
-                                            print(g))
-                                            #width=gwidth, height=gheight)
-        progress$close()
+        g <- composePlotMap(pthreshFlight, pthreshAirportLabel, colorRange, colorScaleMid,
+                            sizeRange, alphaRange, facetVar, facetLabel, facetRows)
+        output$plotUSFlights <- renderPlot(g, width=gwidth, height=gheight)
 
-        cat("graph-map-1\n")
+      } else {
+
+        # Display "No data" message and clear plot
+        showNotification("No data for flight map", type="warning")
+        output$plotUSFlights <- renderPlot(NULL)
+
       }
-    })
 
-    # Compose and render density plot when reactive values change
-    observe({
+    }
 
-      # Capture reactive values
-      # Assignment forces execution of instructions whenever any one variable changes value
-      x <- input$densX
-      xlim <- input$densXLim
-      y <- input$densY
-      yOrder <- input$densyOrder
-      yFillColor <- c(input$densFillColor1, input$densFillColor2)
-      reverseFillColor <- input$densReverseFillColor
-      fillAlpha <- input$densAlpha
-      facetVar <- input$densFacetVar
-      vline <- input$densVLine
+    ##############################################################################################################
+    # Function:  render flight delay density graph
+    ##############################################################################################################
 
-      # Ignore if data not yet available (typically on program initialization)
-      if(exists("fldatb")) {
-        cat("graph-dens-0\n")
+    graphFlightDelayDensity <- function(x, xlim, y, yOrder, yFillColor, reverseFillColor, fillAlpha, facetVar, vline)
+
+      if(exists("fldatb") & exists("aldat")) {
 
         # Configure plot height and width
-        if(facetVar=="Month") {
+        if(input$densFacetVar=="Month") {
           facetLabel <- monthLabel
           facetRows <- 2
           gheight <- 700
           gwidth <- 800
-        } else if(facetVar=="DayOfWeek") {
+        } else if(input$densFacetVar=="DayOfWeek") {
           facetLabel <- weekdayLabel
           facetRows <- 2
           gheight <- 700
           gwidth <- 1600
-        } else if(facetVar=="DOT_ID_Reporting_Airline") {
+        } else if(input$densFacetVar=="DOT_ID_Reporting_Airline") {
           facetLabel <- alLabel
           facetRows <- NULL
           gheight <- 700
@@ -183,36 +107,111 @@ shinyServer(
           gwidth <- 700
         }
 
-        # Render plot
-        progress <- shiny::Progress$new()
-        progress$set(message="composing plot", value=1)
-        output$plotDensityRidge <- renderPlot({# Enable progress indicator
-                                               progress <- shiny::Progress$new()
-                                               on.exit(progress$close())
-                                               progress$set(message="composing plot", value=1)
-                                               # Render plot
-                                               print(composePlotDensity01(fldat, aldat, x, xlim, y, yOrder,
-                                                                          yFillColor, reverseFillColor, fillAlpha,
-                                                                          facetVar, facetLabel, facetRows, vline))},
-                                                width=gwidth, height=gheight)
-        progress$close()
+        # Compose and render density plot
+        g <- composePlotDensity(x, xlim, y, yOrder, yFillColor, reverseFillColor, fillAlpha,
+                                facetVar, facetLabel, facetRows, vline)
+        output$plotDensityRidge <- renderPlot(g, width=gwidth, height=gheight)
 
-        cat("graph-dens-1\n")
+      } else {
+
+        # Display "No data" message and clear plot
+        showNotification("No data for density plot", type="warning")
+        output$plotDensityRidge <- renderPlot(NULL)
+
       }
-    })
 
+    ##############################################################################################################
+    # Data retrieval button event
+    # Aggregate and plot flight map and flight delay density ridges
+    # Do not execute (ignore) during program initialization, when input$retrieveData transitions from NULL to
+    # its default value
+    ##############################################################################################################
+
+    observeEvent(input$retrieveData, {
+
+      readData(input$dirDat)
+      fldatb <<- aggfdat(input$facetVar, input$carrierDelay, input$includeCancel)
+
+      if(nrow(fldat)>0 & nrow(fldatb)>0) {
+
+        graphFlightMap(input$pthreshFlight, input$pthreshAirportLabel, c(input$color1, input$color2, input$color3),
+                       input$colorScaleMid, input$sizeRange, input$alphaRange, input$facetVar, input$carrierDelay)
+        graphFlightDelayDensity(input$densX, input$densXLim, input$densY, input$densyOrder,
+                                c(input$densFillColor1, input$densFillColor2), input$densReverseFillColor,
+                                input$densAlpha, input$densFacetVar, input$densVLine)
+
+      } else {
+
+        showNotification("No data to display.  No observations satisfy query criteria.", type="warning")
+
+      }
+
+    }, ignoreInit=T)
+
+    ##############################################################################################################
+    # Monitor controls that affect data aggregation needed for map generation
+    # Execute during program initialization (do not ignore)
+    ##############################################################################################################
+
+    observeEvent(c(input$facetVar, input$carrierDelay, input$includeCancel), {
+
+      fldatb <<- aggfdat(input$facetVar, input$carrierDelay, input$includeCancel)
+
+    }, ignoreInit=F)
+
+    ##############################################################################################################
+    # Observe reactive values that prompt rendering of flight map
+    # Execute during program initialization (do not ignore)
+    ##############################################################################################################
+
+    observeEvent(c(input$pthreshFlight, input$pthreshAirportLabel, input$color1, input$color2, input$color3,
+                   input$colorScaleMid, input$sizeRange, input$alphaRange, input$facetVar, input$carrierDelay), {
+
+      graphFlightMap(input$pthreshFlight, input$pthreshAirportLabel, c(input$color1, input$color2, input$color3),
+                     input$colorScaleMid, input$sizeRange, input$alphaRange, input$facetVar, input$carrierDelay)
+
+    }, ignoreInit=F)
+
+    ##############################################################################################################
+    # Observe reactive values that prompt rendering of density plot
+    # Execute during program initialization (do not ignore)
+    ##############################################################################################################
+
+    observeEvent(c(input$densX, input$densXLim, input$densY, input$densyOrder, input$densFillColor1,
+                   input$densFillColor2, input$densReverseFillColor, input$densAlpha, input$densFacetVar,
+                   input$densVLine), {
+
+      graphFlightDelayDensity(input$densX, input$densXLim, input$densY, input$densyOrder,
+                              c(input$densFillColor1, input$densFillColor2), input$densReverseFillColor,
+                              input$densAlpha, input$densFacetVar, input$densVLine)
+
+    }, ignoreInit=F)
+
+    ##############################################################################################################
+    # Execution begins here
     # Read data from default location
     # Failure to load data during initialization causes reactive function to execute in a state
     # that loses reactive methods (changing input$ objects does not execute associated observe() functions
     # Waiting to load data with the input$retrieveData event does not resolve the issue (reactive objects
     # fail to execute changes even after data are loaded in the observe event)
     # Explicit load of data resolves the issue and all reactive elements behave normally
-    cat("Read0\n")
-    readData("Session-3-ggplot/SampleData")
-    cat("Read1\n")
+    ##############################################################################################################
+
+    # Read data
+    # Leave aggregation and rendering of map and density plots to observe events during program initialization
+    readData("SampleData")
+
+    # Following explicit calls are invalid because they are called outside of a reactive context (reactive
+    # data values are not available)
+    # agg(input$facetVar, input$carrierDelay, input$includeCancel)
+    # graphFlightMap(input$pthreshFlight, input$pthreshAirportLabel, c(input$color1, input$color2, input$color3),
+                   # input$colorScaleMid, input$sizeRange, input$alphaRange, input$facetVar, input$carrierDelay)
+    # graphFlightDelayDensity(input$densX, input$densXLim, input$densY, input$densyOrder,
+                            # c(input$densFillColor1, input$densFillColor2), input$densReverseFillColor,
+                            # input$densAlpha, input$densFacetVar, input$densVLine)
 
     # Set default data directory and output directory locations
-    updateTextInput(session, "dirDat", value=paste(getwd(), "/Data", sep=""))
+    updateTextInput(session, "dirDat", value=paste(getwd(), "/SampleData", sep=""))
     updateTextInput(session, "dirOut", value=getwd())
 
   }
