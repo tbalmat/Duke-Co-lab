@@ -1,0 +1,29 @@
+\BOOKMARK [1][-]{section.1}{Overview}{}% 1
+\BOOKMARK [1][-]{section.2}{Examples}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Visualizations}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Shiny Apps}{section.2}% 4
+\BOOKMARK [1][-]{section.3}{Resources}{}% 5
+\BOOKMARK [1][-]{section.4}{Shiny use cases}{}% 6
+\BOOKMARK [2][-]{subsection.4.1}{Personal Use}{section.4}% 7
+\BOOKMARK [2][-]{subsection.4.2}{Public App}{section.4}% 8
+\BOOKMARK [1][-]{section.5}{Access Workshop Material}{}% 9
+\BOOKMARK [2][-]{subsection.5.1}{RStudio Cloud}{section.5}% 10
+\BOOKMARK [2][-]{subsection.5.2}{Execute Locally \(copy workshop material from RStudio Cloud\)}{section.5}% 11
+\BOOKMARK [1][-]{section.6}{Anatomy of a Shiny App}{}% 12
+\BOOKMARK [1][-]{section.7}{First App - Histogram of Random, Normally Distributed Values}{}% 13
+\BOOKMARK [2][-]{subsection.7.1}{Version 1: Single Parameter Prompt, Immediate Histogram Rendering}{section.7}% 14
+\BOOKMARK [2][-]{subsection.7.2}{First App, NPD Version 2: Two Parameter Prompt}{section.7}% 15
+\BOOKMARK [2][-]{subsection.7.3}{First App, NPD Version 3: Mean and Std Dev Parameters, Improved Script Structure, Use of Defined Functions, Parameter Validation, Side Bar Panel}{section.7}% 16
+\BOOKMARK [2][-]{subsection.7.4}{First App, NPD Version 4: Curve Control Parameters, Further HTML Formatting, CSS, Incremental Plot Construction}{section.7}% 17
+\BOOKMARK [2][-]{subsection.7.5}{First App, NPD Version 5: Editing Script in an External IDE, Execution Using server.r and ui.r}{section.7}% 18
+\BOOKMARK [1][-]{section.8}{Reactivity}{}% 19
+\BOOKMARK [1][-]{section.9}{HTML}{}% 20
+\BOOKMARK [1][-]{section.10}{Debugging}{}% 21
+\BOOKMARK [1][-]{section.11}{Second App - U.S. Office of Personnel Management Central Personnel Data Overview}{}% 22
+\BOOKMARK [2][-]{subsection.11.1}{Second App, CPDF Analysis Development in R}{section.11}% 23
+\BOOKMARK [2][-]{subsection.11.2}{Second App, CPDF Analysis in Shiny}{section.11}% 24
+\BOOKMARK [2][-]{subsection.11.3}{Second App, Slider Bar for Plot Animation by a Selected Independent Variable}{section.11}% 25
+\BOOKMARK [1][-]{section.12}{Creating a Pseudo App Server Environment}{}% 26
+\BOOKMARK [2][-]{subsection.12.1}{Combine Several Apps Within a Single navbarPage\(\)}{section.12}% 27
+\BOOKMARK [2][-]{subsection.12.2}{Execute Apps Within Individual R Environments}{section.12}% 28
+\BOOKMARK [2][-]{subsection.12.3}{Execute Apps in Parallel Within a Single R Environment}{section.12}% 29

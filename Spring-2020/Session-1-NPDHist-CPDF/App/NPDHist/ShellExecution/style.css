@@ -1,0 +1,19 @@
+body {
+  background-color: #f0f0ee;
+}
+
+h2 {
+  color:#0000a0;
+  display:inline-block;
+}
+
+h3 {
+  color:#0000a0;
+  display:inline-block;
+}
+
+hr {
+  color: gray;
+  background-color: gray;
+  height: 1px;
+}
