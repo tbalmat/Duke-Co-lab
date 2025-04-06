@@ -1,0 +1,37 @@
+\BOOKMARK [1][-]{section.1}{Overview}{}% 1
+\BOOKMARK [1][-]{section.2}{Examples}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Visualizations}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Shiny apps}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Example Data Table apps}{section.2}% 5
+\BOOKMARK [1][-]{section.3}{Resources}{}% 6
+\BOOKMARK [1][-]{section.4}{Shiny use cases}{}% 7
+\BOOKMARK [2][-]{subsection.4.1}{Personal Use}{section.4}% 8
+\BOOKMARK [2][-]{subsection.4.2}{Public App}{section.4}% 9
+\BOOKMARK [1][-]{section.5}{Anatomy of a Shiny App}{}% 10
+\BOOKMARK [1][-]{section.6}{Reactivity}{}% 11
+\BOOKMARK [1][-]{section.7}{Download Workshop Material and Configure R}{}% 12
+\BOOKMARK [1][-]{section.8}{Example Data Set - OPM CPDF}{}% 13
+\BOOKMARK [2][-]{subsection.8.1}{Motivation Graph 1, Increase in Mean Age with Fiscal Year}{section.8}% 14
+\BOOKMARK [2][-]{subsection.8.2}{Motivation Graph 2, Increase in Mean Age with Fiscal Year, Paneled by Grade}{section.8}% 15
+\BOOKMARK [2][-]{subsection.8.3}{Motivation Graph 3, Increase in Mean Age with Fiscal Year, Paneled by Grade, Differentiated by Occupational Category}{section.8}% 16
+\BOOKMARK [2][-]{subsection.8.4}{Motivation Graph 4, Increase in Proportion Employees by Grade and Fiscal Year}{section.8}% 17
+\BOOKMARK [1][-]{section.9}{Development of a Shiny App With Data Tables and Plots}{}% 18
+\BOOKMARK [2][-]{subsection.9.1}{Analysis Script in R \(V1\)}{section.9}% 19
+\BOOKMARK [2][-]{subsection.9.2}{Shiny App with Basic Table and Plot Features \(V2\)}{section.9}% 20
+\BOOKMARK [2][-]{subsection.9.3}{Shiny App with Updated Appearance Using Navigation Bars and Themes \(V3\)}{section.9}% 21
+\BOOKMARK [3][-]{subsubsection.9.3.1}{navbarPage}{subsection.9.3}% 22
+\BOOKMARK [3][-]{subsubsection.9.3.2}{Themes and the theme selector}{subsection.9.3}% 23
+\BOOKMARK [3][-]{subsubsection.9.3.3}{In-line CSS styles}{subsection.9.3}% 24
+\BOOKMARK [3][-]{subsubsection.9.3.4}{showModal\(\) and modalDialog\(\)}{subsection.9.3}% 25
+\BOOKMARK [2][-]{subsection.9.4}{Shiny App with Draggable Panels \(V4\)}{section.9}% 26
+\BOOKMARK [2][-]{subsection.9.5}{Shiny App for Public Deployment \(V5\)}{section.9}% 27
+\BOOKMARK [3][-]{subsubsection.9.5.1}{File Upload}{subsection.9.5}% 28
+\BOOKMARK [3][-]{subsubsection.9.5.2}{Download Link for Sample Upload File}{subsection.9.5}% 29
+\BOOKMARK [3][-]{subsubsection.9.5.3}{Aggregation Table Download}{subsection.9.5}% 30
+\BOOKMARK [3][-]{subsubsection.9.5.4}{Progress Indicators}{subsection.9.5}% 31
+\BOOKMARK [3][-]{subsubsection.9.5.5}{Dynamic Creation of Panels with Imported HTML for Supplemental Project Info}{subsection.9.5}% 32
+\BOOKMARK [3][-]{subsubsection.9.5.6}{Dynamically Created Reactive Elements}{subsection.9.5}% 33
+\BOOKMARK [3][-]{subsubsection.9.5.7}{Error Handling}{subsection.9.5}% 34
+\BOOKMARK [1][-]{section.10}{Advanced Data Table Features}{}% 35
+\BOOKMARK [1][-]{section.11}{Plot Animation - Fiscal Year Slider Bar}{}% 36
+\BOOKMARK [1][-]{section.12}{Debugging}{}% 37

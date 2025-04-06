@@ -1,0 +1,108 @@
+<h4>Quick-start guide</h4>
+
+<p style="margin-top:20px">
+  <b>Review iCPAGdb:</b> Explore pre-calculated iCPAGdb results
+<p>
+
+<ol>
+  <li style="margin-top:5px">
+    Using the selection table (in section 1) click the row with the pair of GWAS datasets that you want to compare (combinations of NHGRI-EBI GWAS catalog, metabolomics, or cellular host-pathogen traits) at the specified p-value thresholds and with the specified population used in calculating LD.  Results appear in the "Table" and "Heatmap" sections below the query controls.
+    <ul>
+      <li style="margin-top:5px">
+        Table: Each pairwise trait combination is listed (Trait<sub>1</sub>, Trait<sub>2</sub>) along with the number of SNPs that overlap directly (Nshare<sub>direct</sub>), the number of SNPs that overlap based on LD-proxy (Nshare<sub>LD</sub>), and the number of SNPs that overlap overall (SNPshare<sub>all</sub>), -log<sub>10</sub>(p-values) calculated by Fisher’s exact test (-log<sub>10</sub>(PFisher)) and corrected by either Benjamini-Hochsberg (-log<sub>10</sub>(Padjust<sub>FDR</sub>) or Bonferroni (-log<sub>10</sub>(P<sub>Bonferroni</sub>)), the shared SNPs (SNP<sub>shared</sub>), similarity indices (Jaccard and Chao-Sorenson), and ontology information based on EFO codes in NHGRI-EBI GWAS catalog. Results can be sorted by any column or restricted by text of any column.
+      </li>
+      <li style="margin-top:5px">
+        Heatmap: By default, the heatmap is based on the Chao-Sorenson similarity index, but options for Jaccard similarity or -log<sub>10</sub>(P<sub>Fisher</sub>) are also available. Hover over cells to inspect the plotted value for pairs of phenotypes.  Click and drag to zoom in on a particular region of the heatmap.
+      </li>
+    </ul>
+  </li>
+  <li style="margin-top:5px">
+    The Filter section (section 2) has controls to alter the contents of the results table and heatmap:
+    <ul style="margin-top:5px">
+      <li style="margin-top:5px">
+        Include all SNPs check-box:  The SNP<sub>shared</sub> column of the output lists all shared SNPs between the two traits, but by default lists only the first 100 characters for easier viewing. Checking this box overrides the default limit and will cause display of the complete shared SNP string.
+      </li>
+      <li style="margin-top:5px">
+        Trait (phenotype), SNP, and EFO parent (for grouping) filter specifiers:  Table records and heatmap cells are limited to phenotype pairs where either GWAS set contains specified filtering values.  Multiple EFOs can be selected.
+      </li>
+      <li style="margin-top:5px">
+        Include compound EFOs check-box:  By default, "compound phenotypes" that list more than one phenotype in NHGRI-EBI were included as part of iCPAGdb analyses but are not included in output, as it is unclear which phenotype was tested for genetic association. However, these phenotypes can be made visible, and will be plotted, by checking this box.
+      </li>
+      <li style="margin-top:5px">
+        Heatmap metric selector:  Alternates between Fisher, Bonferonni, FDR, Jaccard, and Chao-Sorensen measures
+      <li style="margin-top:5px">
+        Top significant phenotypes to plot: Limits the heatmap to the most significant phenotypic relationships (start small, rendering takes time)
+      </li>
+    </ul>
+  </li style="margin-top:5px">
+  <li style="margin-top:5px">
+    Click the "Table" or "Heatmap" buttons to alternate between views
+  </li>
+  <li style="margin-top:5px">
+    Click the "Download" button to download the current table of results (filters applied)
+  </li>
+</ol>
+
+<!--
+<p style="margin-top:20px">
+  <b>Explore iCPAGdb associations:</b> Compute CPAG results using pairs of iCPAGdb GWAS data sets
+</p>
+
+<ol>
+  <li style="margin-top:5px">
+    Select two GWAS datasets for analysis
+  </li>
+  <li style="margin-top:5px">
+    Adjust p-value threshold sliders for each GWAS (phenotypes and SNPs will be limited to those with cross-phenotype significance of association below their corresponding thresholds).  Maximum thresholds vary by source: 5 X 10<sup>-8</sup> for NHGRI, 1 X 10<sup>-5</sup> for H2P2, and 1 X 10<sup>-3</sup> for all others.
+  </li>
+  <li style="margin-top:5px">
+    Select continental group to use in identification of shared SNPs by LD-proxy
+  </li>
+  <li style="margin-top:5px">
+    Click "Compute CPAG"
+  </li>
+  <li style="margin-top:5px">
+    Filter results as in <b>Review</b>
+  </li>
+  <li style="margin-top:5px">
+    Click the "Download" button to download the current (filtered) contents of the results table
+  </li>
+  
+</ol>
+-->
+
+<p style="margin-top:20px">
+  <b>Upload GWAS and compute:</b> Upload your own GWAS summary statistics (SNPs and p-values for a desired phenotype) then have iCPAGdb clump the data and run analyses against datasets in iCPAGdb
+</p>
+
+<ol>
+  <li style="margin-top:5px">
+    Click "Browse" to locate a GWAS summary file on your computer.  Data reside on our server only for the purpose and duration of computation. Your data are deleted immediately after results are returned to you. Results are for research purposes only. No interpretation of significance of any reported result is implied. The input file should contain comma or tab delimited SNP and p columns, with column headings.  Once a local file is selected, the first five records are displayed for you to verify that the uploaded file contains the observations you intend to use and to review column headers.  Tab and comma delimiters are also examined in the first five records.
+  </li>
+  <li style="margin-top:5px">
+    Specify uploaded file delimeter style (comma or tab)
+  </li>
+  <li style="margin-top:5px">
+    Enter the column headers, as they appear in the file, for the SNP and p columns
+  </li>
+  <li style="margin-top:5px"> 
+    Select an iCPAGdb dataset (GWAS source 2) to be compared to your GWAS (GWAS source 1)
+  </li>
+  <li style="margin-top:5px">
+    Use the p-threshold sliders to select filtering limits for both data sets.  Any SNPs in your data or SNP, phenotype combinations in the iCPAGdb data with p-values above the corresponding threshold will be excluded from analysis.  The p-threshold for your GWAS has a range of 5 X 10<sup>-3</sup> to 1 X 10<sup>-20</sup>.  Maximum thresholds for iCPAGdb data vary by source: 5 X 10<sup>-8</sup> for NHGRI, 1 X 10<sup>-5</sup> for H2P2, and 1 X 10<sup>-3</sup> for all others.
+  </li>
+  <li style="margin-top:5px">
+    Select continental group to use in identification of shared SNPs by LD-proxy
+  </li>
+  <li style="margin-top:5px">
+    Click "Compute CPAG"
+  </li>
+  <li style="margin-top:5px">
+    Filter results as in <b>Review</b>
+  </li>
+  <li style="margin-top:5px">
+    Click the "Download" button to download the current (filtered) contents of the results table
+  </li>
+</ol>
+
+<br><br>
