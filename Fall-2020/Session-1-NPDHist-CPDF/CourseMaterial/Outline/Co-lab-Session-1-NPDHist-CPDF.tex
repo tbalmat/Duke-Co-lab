@@ -1,0 +1,838 @@
+\documentclass[10pt, letterpaper]{article}
+\usepackage{setspace}
+\usepackage[letterpaper, margin=1.0in]{geometry}
+\addtolength{\topmargin}{-0.25in}
+%\usepackage{tocloft}
+\usepackage{titlesec}
+%\titleformat*{\section}{\large\bfseries}
+\titleformat*{\section}{\large}
+\titleformat*{\subsection}{\normalsize}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{amsmath}   % includes \boldmath(), \boldsymbol{()}
+\usepackage{bm}        % math fonts, \boldmath{}, \boldsymbol{}
+\usepackage{float}
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\usepackage{subcaption}
+\usepackage{xcolor, colortbl}
+\definecolor{gray}{gray}{0.9}
+\definecolor{ltBlue}{rgb}{0.75, 0.85, 0.975}
+\definecolor{medBlue}{rgb}{0.75, 0.8, 0.9}
+\definecolor{white}{rgb}{1, 1, 1}
+%\rowcolor{ltBlue}
+\usepackage{changepage}
+\usepackage{pdflscape}
+\bibliographystyle{plainnat}
+\usepackage[authoryear, round, semicolon]{natbib}
+\newcommand{\mt}[1]{\bm{#1}^{\prime}}
+\newcommand{\mtm}[2]{\bm{#1}^{\prime}\bm{#2}}
+\newcommand{\mi}[1]{\bm{#1}^{-1}}
+\newcommand{\mest}[1]{\hat{\bm{#1}}}
+\usepackage[bottom]{footmisc}
+\setlength{\skip\footins}{12pt}
+\setlength\parindent{0pt}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+}
+% Disable section numbers, so that hyperlinks are enabled
+%\setcounter{secnumdepth}{0}
+
+\title{\Large Co-lab Shiny Workshop - Hello Shiny!\\[6pt]
+       \large Normal Probability Density Histogram, Reactivity, ggplot, OPM Overview\\[6pt]
+       October 15, 2020\\[20pt]
+       \normalsize thomas.balmat@duke.edu\\[1pt]rescomputing@duke.edu}
+
+%\date{\vspace{-30pt}October 17, 2019}
+\date{}
+%\author{thomas.balmat@duke.edu\\rescomputing@duke.edu}
+
+\begin{document}
+    
+\begin{spacing}{1.0}
+    
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
+
+\section{Overview}
+
+\begin{itemize}
+    \item Preliminaries
+      \begin{itemize}
+        \item What is R?
+        \item What is Shiny?
+        \item What can Shiny do for you?
+        \item What are your expectations of this workshop?
+        %\item Interest in R Day?
+      \end{itemize}
+    \item \hyperref[sec:examples]{Examples}
+      \begin{itemize}
+        \item \hyperref[sec:examplevis]{Example visualizations}
+        \item \hyperref[sec:exampleapps]{Example Shiny apps}
+      \end{itemize}
+    \item \hyperref[sec:resources]{Resources}
+    \item \hyperref[sec:usecases]{Shiny use cases}
+      \begin{itemize}
+        \item \hyperref[sec:usecase1]{Personal use to expedite research and results}
+        \item \hyperref[sec:usecase2]{Develop an app for public use}
+      \end{itemize}
+    \item \hyperref[sec:accesworkshopmaterial]{Workshop material}
+      \begin{itemize}
+        \item \hyperref[sec:materialgit]{From github (execute locally)}
+        \item \hyperref[sec:materialcloud]{From RStudio Cloud}
+      \end{itemize}
+    \item \hyperref[sec:anatomyofapp]{Anatomy of a Shiny app}
+    \item \hyperref[sec:firstappNPD]{First app - Histogram of random, normally distributed values}
+      \begin{itemize}
+        \item \hyperref[sec:NPD-1]{Version 1:  single parameter prompt, immediate histogram rendering}
+        \item \hyperref[sec:NPD-2]{Version 2:  two parameter prompt}
+        \item \hyperref[sec:NPD-3]{Version 3:  mean and std dev parameters, improved script structure, use of defined functions, parameter validation, side bar panel}
+        \item \hyperref[sec:NPD-4]{Version 4:  curve control parameters, further HTML formatting, CSS, incremental plot construction}
+        \item \hyperref[sec:NPD-5]{Version 5:  editing script in an external IDE, execution using \texttt{server.r} and \texttt{ui.r}}
+      \end{itemize}
+    \item \hyperref[sec:reactivity]{Reactivity}
+    \item \hyperref[sec:HTML]{HTML}
+    \item \hyperref[sec:debugging]{Debugging}
+    \item \hyperref[sec:CPDF]{Second app - OPM Central Personnel Data File summary}
+      \begin{itemize}
+        \item \hyperref[sec:CPDF-R]{Development of analysis in R}
+        \item \hyperref[sec:CPDF-Shiny]{Shiny implementation}
+        \item \hyperref[sec:CPDF-Slider]{Slider bar for plot animation by a selected independent variable}
+      \end{itemize}
+    \item \hyperref[sec:nav]{Creating a pseudo app server environment}
+      \begin{itemize}
+        \item \hyperref[sec:navbarpage]{Combine several \texttt{ui()} and \texttt{server()} functions in a single \texttt{navbarPage()}}
+        \item \hyperref[sec:navindivproc]{Execute apps within individual R environments}
+        \item \hyperref[sec:navparproc]{Execute apps in parallel within a single R environment}
+      \end{itemize}
+        
+\end{itemize}
+
+% Shiny server
+% http vs. https
+% Global mem
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Examples}\label{sec:examples}
+
+\subsection{Visualizations}\label{sec:examplevis}
+\begin{itemize}
+  \item \texttt{ggplot} gallery:  \url{https://www.r-graph-gallery.com/all-graphs.html}
+  \item \texttt{ggplot} extensions:  \url{https://mode.com/blog/r-ggplot-extension-packages}
+\end{itemize}
+
+\subsection{Shiny Apps}\label{sec:exampleapps}
+\begin{itemize}
+  \item Duke Data+ project, \textit{Big Data for Reproductive Health}, \url{http://bd4rh.rc.duke.edu:3838}
+  \item Duke Data+ project, \textit{Water Quality Explorer}, \url{http://WaterQualityExplorer.rc.duke.edu:3838}
+  \item Duke Med H2P2 Genome Wide Association Study, \url{http://h2p2.oit.duke.edu}
+  \item Duke Nicholas School, \textit{Health Effects of Airborne Pollutants}, \url{http://shindellgroup.rc.duke.edu}
+  \item Duke Nursing School, \textit{Urea Cycle Disorder SNOMED/RxNorm Graph Associations}
+  \item Duke Research Computing, \textit{Demand and Delivery Clustering Models}, \url{https://rstudio.cloud/project/1062429} (GraphDeliverMap subdirectory)
+  \item Shiny gallery:  \url{https://shiny.rstudio.com/gallery/}
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Resources}\label{sec:resources}
+
+\begin{itemize}
+
+  \item R
+    \begin{itemize}   
+      \item Books
+        \begin{itemize}
+          \item Norm Matloff, \textit{The Art of R Programming}, No Starch Press
+          \item Wickham and Grolemund, \textit{R for Data Science}, O'Reilly
+          \item Andrews and Wainer, \textit{The Great Migration:  A Graphics Novel}, \url{https://rss.onlinelibrary.wiley.com/doi/pdf/10.1111/j.1740-9713.2017.01070.x}
+          \item Friendly, \textit{A Brief History of Data Visualization}, \url{http://datavis.ca/papers/hbook.pdf}
+        \end{itemize}
+      \item Reference cards
+        \begin{itemize}
+          \item R reference card:  \url{https://cran.r-project.org/doc/contrib/Short-refcard.pdf}
+          \item Base R:  \url{https://rstudio.com/wp-content/uploads/2016/10/r-cheat-sheet-3.pdf}
+          \item Shiny, \texttt{ggplot}, \texttt{markdown}, \texttt{dplyr}, \texttt{tidy}: \url{https://rstudio.com/resources/cheatsheets/}
+        \end{itemize}
+    \end{itemize}
+
+  \item Shiny help
+    \begin{itemize}
+        \item \texttt{?shiny} from the R command line
+        \item Click \texttt{shiny} in the \texttt{Packages} tab of RStudio
+        \item \url{https://cran.r-project.org/web/packages/shiny/shiny.pdf}
+    \end{itemize}
+
+  \item \texttt{ggplot} help
+    \begin{itemize}
+        \item \texttt{?ggplot2} from the R command line
+        \item Click \texttt{ggplot2} in the \texttt{Packages} tab of RStudio
+        \item \url{https://cran.r-project.org/web/packages/ggplot2/ggplot2.pdf}
+    \end{itemize}
+
+  \item Workshop materials:  \url{https://rstudio.cloud/project/1768881}
+
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Shiny use cases}\label{sec:usecases}
+
+\subsection{Personal Use}\label{sec:usecase1}
+
+Shiny can expedite identification of model and visualization parameter values that illustrate important properties of systems that you want to document or publish.  Instead of repetitious modification of ``hard coded" values in scripts, followed by execution, Shiny can re-execute a script using parameter values taken from on-screen prompts (text inputs, radio buttons, slider bars, etc.).  Figure \ref{fg:DukeLawWordPairXY} is a screen-shot of a Shiny app that was developed to compare incidence proportion of words appearing in case opinions of two categories.  The adjustable p-window parameter aids in identifying filtering bounds on proportion that reveal significant associations (high p in both dimensions), while eliminating spurious ones (low p in either dimension).  Slider bar adjustment of p-value replaces iterative R script editing and manual plotting.  Shiny scripts are available at \url{https://github.com/tbalmat/Duke-Co-lab/tree/master/Examples/Law/OpinionWordProportionXY}\\
+
+\begin{figure}[h!]
+    \includegraphics[width=6.5in, trim={0 0 0 0}, clip]{{OpinionWordProportionXYPlotApp}.png}
+    \centering
+    \caption{Shiny app developed to explore two-way incidence proportions of words in legal text.}
+    \label{fg:DukeLawWordPairXY}
+\end{figure}
+
+Figure \ref{fg:DukeLawWordPairCorr} is a screen-shot from another legal text analysis app that identifies, for various case and opinion types, edge frequencies that reveal word pair proportions and correlation.  Choice of small edge frequency values fails to reveal all important associations, while large values cause a cluttered graph that hides primary associations.  The edge frequency slider input replaces iterative R script parameter value specification and manual plotting.  Shiny scripts are available at \url{https://github.com/tbalmat/Duke-Co-lab/tree/master/Examples/Law/OpinionTextCorrelationGraph}\\
+
+\begin{figure}[h!]
+    \includegraphics[width=6.5in, trim={0 0 0 0}, clip]{{OpinionTextAnalysisApp-Freq-Corr}.png}
+    \centering
+    \caption{Shiny app developed to explore leading and trailing word pair correlation in case opinion text, using a graph with filtered edge density.}
+    \label{fg:DukeLawWordPairCorr}
+\end{figure}  
+
+\clearpage
+
+\subsection{Public App}\label{sec:usecase2}
+
+Alternatively, apps can be developed for public use, so that others can investigate your data and models and become better informed from your research.  Figure \ref{fg:DukeH2P2} is a screen-shot from an app developed by the H2P2 (Hi-Host Phenome)  Project at Duke.  Researchers from around the world use it to explore associations between 150 cell pathogens and 15,000,000 chromosomal positions.  The site url is \url{http://h2p2.oit.duke.edu}.  Example Shiny scripts are available at \url{https://github.com/tbalmat/Duke-Co-lab/tree/master/Examples/H2P2}\\
+
+\begin{figure}[h!]
+    \includegraphics[width=6.5in, trim={0 0 0 0}, clip]{{H2P2PhenotypicAssociations}.png}
+    \centering
+    \caption{Shiny app developed to query and plot results from a Duke hosted genome wide association study.}
+    \label{fg:DukeH2P2}
+\end{figure}
+
+%\vspace{1.5in}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Access Workshop Material}\label{sec:accesworkshopmaterial}
+
+\subsection{RStudio Cloud}\label{sec:materialcloud}
+
+\begin{itemize}
+    \item What is RStudio Cloud?
+    \begin{itemize}
+        \item \textit{We} {[RStudio]} \textit{created RStudio Cloud to make it easy for professionals, hobbyists, trainers, teachers and students to do, share, teach and learn data science using R.}
+    \end{itemize}
+    \item With RStudio Cloud
+    \begin{itemize}
+        \item You do not need RStudio installed locally
+        \item Packages and data are available without installation and transfer
+    \end{itemize}
+    \item Access workshop material
+    \begin{itemize}
+        \item Create an Account:  \url{https://rstudio.cloud}
+        \item Workshop project link:  \url{https://rstudio.cloud/project/1768881} (Duke-Co-lab/Shiny/Session-1-NPDHist-CPDF subdirectory)
+    \end{itemize}
+    \item All workshop scripts should function on RStudio Cloud, except OS shells that are used to automate execution
+\end{itemize}
+
+\subsection{Execute Locally (copy workshop material from RStudio Cloud)}\label{sec:materialgit}
+
+\begin{itemize}
+    \item Copy scripts and data from \url{https://rstudio.cloud/project/1768881} (Duke-Co-lab/Shiny/Session-1-NPDHIST-CPDF subdirectory)
+    \item All workshop scripts should function locally
+    \item Additional material, for this and other workshop sessions, is available at \url{https://github.com/tbalmat/Duke-Co-lab}
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Anatomy of a Shiny App}\label{sec:anatomyofapp}
+
+A Shiny app is an R script executing in an active R environment that uses functions available in the Shiny package to interact with a web browser.  The basic components of a Shiny script are
+
+\begin{itemize}
+  \item \texttt{ui()} function
+    \begin{itemize}
+      \item Contains your web page layout and screen objects for inputs (prompt fields) and outputs (graphs, tables, etc.)
+      \item Is specified in a combination of Shiny function calls and raw HTML
+      \item Defines variables that bind web objects to the execution portion of the app
+    \end{itemize}
+  \item \texttt{server()} function
+    \begin{itemize}
+      \item The execution portion of the app
+      \item Contains a combination of standard R statements and function calls, such as to \texttt{apply()}, \texttt{lm()}, \texttt{ggplot()}, etc., along with calls to functions from the Shiny package that enable reading of on-screen values and rendering of results
+    \end{itemize}
+  \item \texttt{runApp()} function
+    \begin{itemize}
+      \item Creates a process listening on a tcp port, launches a browser (optional), renders a screen by calling the specified \texttt{ui()} function, then executes the R commands in the specified server() function
+    \end{itemize}
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{First App - Histogram of Random, Normally Distributed Values}\label{sec:firstappNPD}
+
+\subsection{Version 1:  Single Parameter Prompt, Immediate Histogram Rendering}\label{sec:NPD-1}
+
+Workshop file (RStudio Cloud) \texttt{Session-1-NPDHist-CPDF/App/NPDHist/NPDHist-1.r}.  Features include
+
+\begin{itemize}
+    \item Simple, ``Hello World" example
+    \item Prompts user for a number of random values to generate (\texttt{ui()} function)
+    \item Generates the requested number of values, using a mean of 0 and standard deviation of 1 (\texttt{server()} function)
+    \item Prepares a histogram of the generated values, using \texttt{ggplot()} (\texttt{server()} function)
+    \item Displays the histogram in the user's browser (\texttt{ui()} function)
+    \item The single on-screen adjustable object is a slider bar for selection of \texttt{n}, the number of values to generate
+    \item Reference of \texttt{n} in a \textit{reactive} context in \texttt{server()} causes immediate regeneration of random values and histogram rendering
+\end{itemize}
+
+Figure \ref{fg:NPD-1} is an example screen-shot of the app.
+
+\vspace{12pt}
+
+\begin{figure}[H]
+    \includegraphics[width=4.5in, trim={0 0 0 0}, clip]{{NPD-1}.png}
+    \centering
+    \caption{Screen-shot of first app.  Normally distributed random values.  Single parameter prompt.}
+    \label{fg:NPD-1}
+\end{figure}
+
+\vspace{12pt}
+
+The script that generated this app follows.
+
+\scriptsize
+\begin{verbatim}
+# Shiny App
+# Generate a histogram from random normal values
+# Version 1, one reactive variables
+
+options(max.print=1000)      # number of elements, not rows
+options(stringsAsFactors=F)
+options(scipen=999999)
+#options(device="windows")
+
+library(shiny)
+library(ggplot2)
+
+# A Shiny app consists of ui() and server() functions
+
+# ui() can contain R statements (open a database and query it to populate selection lists, etc.), but its primary
+# purpose is to format your web page (notice the explicit use of HTML tags)
+
+# The HTML() function instructs Shiny to pass contained text to the browser verbatim, and is useful for formatting
+# your page
+
+# server() is a function containing R statements and function calls 
+# Any base function, functions declared in loaded packages (importantly, Shiny, here), or functions that you create
+# in global memory can be called
+
+# runApp() is a Shiny function that launches your default browser, renders a page based on the ui() function passed,
+# then executes the server() function
+
+ui <- function(req) {
+    
+    fluidPage(
+    
+    HTML("<br><b>Duke University Co-lab - Hello Shiny!<br><br>Generate Random, Normally Distributed Values</b><br><br>"),
+    
+    # Prompt
+    fluidRow(width=12,
+    column(width=5, sliderInput("n", "number to generate", min=0, max=50000, step=250, value=5000, width="90%"))
+    ),
+    
+    HTML("<br><br><br>"),
+    
+    # Graph
+    fluidRow(width=12,
+    column(width=12, plotOutput("plot", width="600px", height="600px"))
+    )
+    
+    )
+    
+}
+
+server <- function(input, output, session) {
+    
+    # Use of cat() displays messages in R console, stderr() causes disply in red and writes to log (Shiny server)
+    #cat("AAA", file=stderr())
+    
+    # Bind reactive variable(s)
+    # They are referenced as functions in a reactive context (renderPlot, renderText, renderPlotly, renderTable, etc.)
+    # Change in the value of reactive variables causes reactive function (renderPlot below) to be re-evaluated with new values
+    n <- reactive(input$n)
+    
+    # Create and render plot
+    # References to n() causes re-execution of renderPlot() anytime input$n is modified
+    # This gives the "instantaneous" or "fluid" appearance to graph updates in response to on-screen inputs
+    output$plot <- renderPlot(
+    ggplot() +
+      geom_histogram(aes(x=rnorm(n())), color="white", fill="blue3") +
+      scale_y_continuous(labels=function(x) format(x, big.mark=",")) +
+      theme(plot.title=element_text(size=14, hjust=0.5),
+      plot.subtitle=element_text(size=12, hjust=0.5),
+      plot.caption=element_text(size=12, hjust=0.5),
+      panel.background=element_blank(),
+      panel.grid.major.x=element_blank(),
+      panel.grid.major.y=element_blank(),
+      panel.grid.minor=element_blank(),
+      panel.border=element_rect(fill=NA, color="gray75"),
+      panel.spacing.x=unit(0, "lines"),
+      axis.title.x=element_text(size=12),
+      axis.title.y=element_text(size=12),
+      axis.text.x=element_text(size=10),
+      axis.text.y=element_text(size=10),
+      strip.text=element_text(size=10),
+      strip.background=element_blank(),
+      legend.position="bottom",
+      legend.background=element_rect(color="gray"),
+      legend.key=element_rect(fill="white"),
+      legend.box="horizontal",
+      legend.text=element_text(size=8),
+      legend.title=element_text(size=8)) +
+      labs(title=paste(format(n(), big.mark=","), " normal(0, 1) pseudo-random values\n", sep=""), x="\nz",  y="frequency\n")
+    )
+    
+}
+
+# Execute
+runApp(list("ui"=ui, "server"=server), launch.browser=T)}
+\end{verbatim}
+\normalsize
+
+Points to discuss
+
+\begin{itemize}
+    \item Required libraries
+    \item Instantiating \texttt{ui()} and \texttt{server()} functions
+    \item Executing \texttt{runApp()}
+    \item Terminating the app (esc key, stop sign)
+    \item Residual browser effects
+    \item \texttt{ui()} features
+      \begin{itemize}
+          \item \texttt{fluidPage()}
+          \item \texttt{fluidRow()}
+          \item \texttt{column()}
+          \item Use of \texttt{HTML()}
+          \item Common error (\texttt{"Warning: Error in tag: argument is missing, with no default"}) when delimiting comma missing between parameters of \texttt{fluidPage()}, \texttt{fluidRow}, \texttt{column()}, etc.  
+      \end{itemize}
+    \item \texttt{server()} features
+      \begin{itemize}
+          \item \texttt{reactive(n)} declares \texttt{n} to be \texttt{reactive} causing reactive functions referencing \texttt{n()}, such as \texttt{renderPlot()}, to be executed when the on-screen parameter bound to \texttt{n} is updated  
+          \item \texttt{renderPlot()} creates a \textit{reactive} environment for \texttt{n()})
+          \item Use of \texttt{ggplot()}
+          \item \textit{Reactive} nature of \texttt{n}
+      \end{itemize}
+    \item \texttt{runApp()} features
+      \begin{itemize}
+          \item \texttt{launch.browser=T}
+          \item Alternate method(s) of launching a Shiny app (\texttt{ui.r}, \texttt{server.r}, \texttt{runApp(appDir=, host=, port=)})
+      \end{itemize}
+\end{itemize}
+
+%%%%%%%
+
+\clearpage
+
+\subsection{First App, NPD Version 2: Two Parameter Prompt}\label{sec:NPD-2}
+
+Workshop file \texttt{App/NPDHist/NPDHist-2.r}.  Figure \ref{fg:NPD-2} is an example screen-shot.
+
+\vspace{12pt}
+
+\begin{figure}[H]
+    \includegraphics[width=5.5in, trim={0 0 0 0}, clip]{{NPD-2}.png}
+    \centering
+    \caption{Screen-shot of first app, version 2.  Normally distributed random values.  Two parameter prompt.}
+    \label{fg:NPD-2}
+\end{figure}
+
+\vspace{12pt}
+
+Features and discussion points include
+
+\begin{itemize}
+    \item Modification of either on-screen parameter (\texttt{n} or \texttt{bar\_width}) causes immediate regeneration of random values and histogram
+    \item What consideration to problem size (number of observations, model computation time) should be given when multiple on-screen elements are reactive?
+\end{itemize}
+
+%%%%%%%%
+
+\clearpage
+
+\subsection{First App, NPD Version 3: Mean and Std Dev Parameters, Improved Script Structure, Use of Defined Functions, Parameter Validation, Side Bar Panel}\label{sec:NPD-3}
+
+Workshop file \texttt{App/NPDHist/NPDHist-3.r}.  Figure \ref{fg:NPD-3} is an example screen-shot.
+
+\begin{figure}[H]
+    \includegraphics[width=6.5in, trim={0 0 0 0}, clip]{{NPD-3}.png}
+    \centering
+    \caption{Screen-shot of first app, version 3.  Normally distributed random values.  Improved script, parameter validation, side bar panel.}
+    \label{fg:NPD-3}
+\end{figure}
+
+\vspace{12pt}
+
+Features and discussion points include
+  
+\begin{itemize}
+    \item Additional reactive variables for mean and standard deviation
+    \item Model and plot parameter validation
+    \item Use of defined function calls from within the \texttt{server()} function
+    \item Further HTML formatting
+    \item Implementation of \texttt{sidebarPanel()}
+\end{itemize}
+
+%%%%%%%%%%
+
+\clearpage
+
+\subsection{First App, NPD Version 4: Curve Control Parameters, Further HTML Formatting, CSS, Incremental Plot Construction}\label{sec:NPD-4}
+
+Workshop file \texttt{App/NPDHist/NPDHist-4.r}.  Figure \ref{fg:NPD-4} is an example screen-shot.
+
+\vspace{12pt}
+
+\begin{figure}[H]
+    \includegraphics[width=6in, trim={0 0 0 0}, clip]{{NPD-4}.png}
+    \centering
+    \caption{Screen-shot of first app, version 4.  Normally distributed random values.  Further HTML formatting, use of CSS, incremental plot construction.}
+    \label{fg:NPD-4}
+\end{figure}
+
+\vspace{12pt}
+
+Features and discussion points include
+
+\begin{itemize}
+    \item Additional controls for bar color and continuous curve features
+    \item Further HTML formatting (div for page and side bar margins)
+    \item Use of cascading style sheet for HTML appearance
+    \item Incremental construction of plot, based on requested features (web page controls)
+    \item Suggestion:  modify the list resulting from \texttt{ggplot()} to affect behavior and appearance
+    \item Use of \texttt{input\$x} within reactive function, as opposed to \texttt{x <- reactive(x)} followed by reference to \texttt{x()}
+    \item Is there any difference in the \texttt{input\$x} and \texttt{x()} reference methods?
+\end{itemize}
+
+%%%%%%%%%%
+
+\subsection{First App, NPD Version 5:  Editing Script in an External IDE, Execution Using \texttt{server.r} and \texttt{ui.r}}\label{sec:NPD-5}
+
+Workshop files are in \texttt{App/NPDHist/ShellExecution}.  Features and discussion points include
+
+\begin{itemize}
+    \item Separate files for \texttt{ui()} and \texttt{server()} (improved isolation and maintainability)
+    \item Option to use a preferred IDE for editing scripts
+    \item Shell execution of R with \texttt{runApp()} targeting \texttt{ui.r} and \texttt{server.r} files, along with port specification implements a pseudo web server environment
+\end{itemize}
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Reactivity}\label{sec:reactivity}
+
+Ideally, in the NPD app, changing bar color and enabling/disabling the continuous curve should not generate new random values, but simply regenerate the plot using the current values.  However, The app does not distinguish between reactive parameter changes that are functionally important vs. merely aesthetic.  Further, there does not seem to be a way of determining which reactive variable has triggered an event.  Perhaps some info is available in the \texttt{reactiveValues()} list, \url{https://shiny.rstudio.com/reference/shiny/latest/reactiveValues.html}.  The reactive log may be helpful, \url{https://shiny.rstudio.com/reference/shiny/0.14/showReactLog.html}.  Considerations include
+
+\begin{itemize}
+    \item Calls to \texttt{renderPlot(npdPlot())} have specified parameters in a reactive context (\texttt{input\$n})
+    \item Can calls mix reactive and non-reactive variables?
+    \item \texttt{isolate()} disables reactivity within a reactive environment
+    \item Consider the example in \texttt{App/NPDHist/ShellExecution/isolate/server.r}
+    \item The order of execution of reactive functions is not guaranteed, \url{https://shiny.rstudio.com/articles/debugging.html}
+    \item Reactive functions (\texttt{observeEvent()}, \texttt{renderPlot()}) are executed during program initialization, since values transition from NULL to some initial value (\texttt{min} of a \texttt{sliderInput()}).  The \texttt{ignoreInit} parameter of \texttt{observeEvent()} instructs to bypass execution on the initial transition from NULL.
+    \item Reactive variables (\texttt{input\$x}) cannot be referenced outside of a reactive context\\
+    Example: \texttt{if(input\$x>0) {output\$plot <- renderPlot(... do something with input\$x)}}\\
+    generates error message:\\\\
+    \texttt{Error in .getReactiveEnvironment()\$currentContext() : 
+    Operation not allowed without an active reactive context. (You tried to do something that can only be done from inside a reactive expression or observer.)}
+\end{itemize}
+
+More information on Shiny reactivity is available at \url{https://shiny.rstudio.com/articles/reactivity-overview.html}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{HTML}\label{sec:HTML}
+
+Although we have, generally, used the \texttt{HTML()} function to inject tags for rendering, Shiny has a set of HTML builder and tag functions that accomplish similar results.  For instance, the function calls \texttt{br()} and \texttt{HTML("<br>")} are equivalent.  \texttt{br()} seems more compact, while \texttt{HTML("<br>")} seems more verbose.  Additional information is available at \url{https://shiny.rstudio.com/reference/shiny/latest/builder.html} and \url{https://shiny.rstudio.com/articles/html-tags.html}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Debugging}\label{sec:debugging}
+
+It is important that you have a means of communicating with your app during execution.  Unlike a typical R script, that can be executed one line at a time, with interactive review of variables, once a Shiny script launches, it executes without the console prompt.  Upon termination, some global variables may be available for examination, but you may not have reliable information on when they were last updated.  Error and warning messages are displayed in the console (and the terminal session when executed in a shell) and, fortunately, so are the results of \texttt{print()} and \texttt{cat()}.  When executed in RStudio, Shiny offers sophisticated debugger features (more info at \url{https://shiny.rstudio.com/articles/debugging.html}).  However, one of the simplest methods of communicating with your app during execution is to use \texttt{print()} (for a formatted or multi-element object, such as a data frame) or \texttt{cat(, file=stderr())} for ``small" objects.  The \texttt{file=stderr()} causes displayed items to appear in red.  Output may also be written to an error log, depending on your OS.  Considerations include
+
+\begin{itemize}
+    \item Shiny reports line numbers in error messages relative to the related function (\texttt{ui()} or \texttt{server()}) and, although not always exact, reported lines are usually in the proximity of the one which was executed at the time of error
+    \item \texttt{cat("your message here")} displays in RStudio console (generally, consider Shiny Server)
+    \item \texttt{cat("your message here", file=stderr())} is treated as an error (red in console, logged by OS)
+    \item Messages appear in RStudio console when Shiny app launched from within RStudio
+    \item Messages appear in terminal window when Shiny app launched with the \texttt{rscript} command in shell
+    \item There exists a ``showcase" mode (\texttt{runApp(display.mode="showcase")}) that is intended to highlight each line of your script as it is executing
+    \item The reactivity log may be helpful in debugging reactive sequencing issues (\texttt{options(shiny.reactlog=T)}, \url{https://shiny.rstudio.com/reference/shiny/0.14/showReactLog.html}
+    \url It may be helpful to initially format an apps appearance with an empty \texttt{server()} function, then include executable statements once the screen objects are available and configured
+    \item Although not strictly related to debugging, the use of \texttt{gc()} to clear defunct memory (from R's recycling) may reduce total memory in use at a given time
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Second App - U.S. Office of Personnel Management Central Personnel Data Overview}\label{sec:CPDF}
+
+The U.S. Office of Personnel Management maintains records on the careers of millions of current and past federal employees.  The Human Capital and Synthetic Data projects at Duke have conducted various research using these data.  Although the complete data set contains data elements that are private and not released to the public, OPM has released data sets with private elements omitted and with certain variables (age, for instance) induced with statistical noise.  We will use a subset of results made available by Buzzfeed.  The accuracy of the publicly available elements has been confirmed by comparison of data procured by Duke through FOIA requests.  The data are highly aggregated, so that are analysis is limited to broad patterns, typically involving means of pay, age, education, etc. for large groups of employees.  Additional information on the OPM data set, research at Duke, and Buzzfeed is available at
+
+\begin{itemize}
+  \item The Office of Personnel Management:  \url{https://www.opm.gov/}
+  \item OPM Guide to Data Standards:
+    \begin{itemize}
+      \item \url{https://www.opm.gov/policy-data-oversight/data-analysis-documentation/data-policy-guidance/reporting-guidance/part-a-human-resources.pdf}
+      \item \url{https://github.com/tbalmat/Duke-Co-lab/blob/master/Docs/US-OPM-Guide-To-Data-Standards.pdf}
+    \end{itemize}
+  \item Duke Synthetic Data Project, Annals of Applied Statistics paper:
+    \begin{itemize}
+      \item \url{https://projecteuclid.org/euclid.aoas/1532743488}
+      \item \url{https://github.com/tbalmat/Duke-Co-lab/blob/master/Docs/AOAS1710-027R2A0.pdf}
+    \end{itemize}
+  \item U.S. Federal Grade Inflation supplement to Synthetic Data paper (section 9):  \url{https://github.com/tbalmat/Duke-Co-lab/blob/master/Docs/SynthDataValidationSupplement.pdf}
+  \item Buzzfeed OPM data:  \url{https://www.buzzfeednews.com/article/jsvine/sharing-hundreds-of-millions-of-federal-payroll-records}
+\end{itemize}
+
+Notes on the data set:
+
+\begin{itemize}
+    \item Observations are limited to general schedule (GS) grades 1 through 15, fiscal years 1988 through 2011, full-time employees
+    \item Columns included:
+    \begin{itemize}
+        \item fy - U.S. federal government fiscal year
+        \item agency - federal agency employed (synthetically generated for workshop)
+        \item age - employee age (five year increments, noised induced by OPM)
+        \item grade - general schedule (GS) grade
+        \item occCat - occupational category 
+        \item yearsEd - years of education
+        \item n - number of observations (employees) in fy, agency, age, grade, occCat, yearsEd combination
+        \item sumPay - sum of basic pay in fy, agency, age, grade, occCat, yearsEd combination (in 2011 \$U.S.)
+    \end{itemize}
+    \item There is one record for each unique combination of fy, agency, age, grade, occCat, yearsEd combination
+    \item n and sumPay are aggregated within fy, agency, age, grade, occCat, yearsEd combinations
+\end{itemize}
+
+%%%%%%%%%%
+
+\subsection{Second App, CPDF Analysis Development in R}\label{sec:CPDF-R}
+
+Workshop file \url{https://rstudio.cloud/project/1768881},\\ \texttt{Duke-Co-lab/Shiny/Session-1-NPDHist-CPDF/App/CPDF/CPDF-1.r}.  Two types of plots will be produced:  an x-y plot to show relationships between two CPDF variables and a kernel density plot to show the distribution of observations for a given variable.  Figure \ref{fg:CPDF-Analysis-1} is an example x-y plot and figure \ref{fg:CPDF-Analysis-2} is an example kernel density plot.\\
+
+Discussion points:
+
+\begin{itemize}
+    \item Computation of mean pay due to initial aggregation producing sum(pay) for each category
+    \item Construction of common \texttt{ggTheme} (inspect and modify list results)
+    \item Use of \texttt{aggregate()} to produce graphics data set
+    \item Step-wise construction of plot (\texttt{g <- ggplot()}) (inspect list results)
+    \item \texttt{ggplot()} features to be controlled in Shiny app:  dependent var, independent var, faceting, color, alpha
+    \item Use of \texttt{aes\_string()}
+    \item \texttt{geom\_smooth()} with LOESS
+\end{itemize}
+
+\begin{figure}[h!]
+    \includegraphics[width=6in, trim={0 0 0 0}, clip]{{CPDF-Analysis-1}.png}
+    \centering
+    \caption{Example x-y plot from CPDF analysis development in R. Mean age vs. fiscal year.}
+    \label{fg:CPDF-Analysis-1}
+\end{figure}
+
+\begin{figure}[h!]
+    \includegraphics[width=6in, trim={0 0 0 0}, clip]{{CPDF-Analysis-2}.png}
+    \centering
+    \caption{Example kernel density plot from CPDF analysis development in R.  Distribution of grade by fiscal year.}
+    \label{fg:CPDF-Analysis-2}
+\end{figure}
+
+\clearpage
+
+%%%%%%%%%%
+
+\subsection{Second App, CPDF Analysis in Shiny}\label{sec:CPDF-Shiny}
+
+Workshop files in \url{https://rstudio.cloud/project/1768881}, subdirectory \\ \texttt{Duke-Co-lab/Shiny/Session-1-NPDHist-CPDF/App/CPDF/ShellExecution/CPDF-Shiny-1}.  These implement the CPDF R analysis in Shiny.  Figure \ref{fg:CPDF-Shiny-1} is an example screen-shot of the x-y tab.  Figure \ref{fg:CPDF-Shiny-2} is an example screen-shot of the distribution tab. 
+
+Features:
+
+\begin{itemize}
+    \item CPDF observations are read into global memory to be available by both \texttt{ui()} and \texttt{server()}
+    \item \texttt{tabsetPanel()}, one tab for x-y plots, one for distribution plots
+    \item \texttt{sidebarPanel()} improves appearance and organization of screen prompts
+    \item Reactivity limited to ``plot" action button (note the assignment of reactive variables to local R variables in \texttt{server()} to decouple reactivity
+    \item Data aggregation and plot generation is accomplished in functions outside of \texttt{renderPlot()} to improve program design, flow, and consistency through use of common procedure
+    \item Ordering of occCat (PATCO) by creating a factor 
+\end{itemize}
+
+\begin{figure}[h!]
+    \includegraphics[width=6in, trim={0 0 0 0}, clip]{{CPDF-Shiny-1}.png}
+    \centering
+    \caption{CPDF x-y analysis in Shiny app.  Mean pay by year, paneled by occupational category, colored by years of education.}
+    \label{fg:CPDF-Shiny-1}
+\end{figure}
+
+\begin{figure}[h!]
+    \includegraphics[width=6in, trim={0 0 0 0}, clip]{{CPDF-Shiny-2}.png}
+    \centering
+    \caption{CPDF employee analysis in Shiny app.  Distribution of age by year.}
+    \label{fg:CPDF-Shiny-2}
+\end{figure}
+
+%%%%%%%%%%
+
+\subsection{Second App, Slider Bar for Plot Animation by a Selected Independent Variable}\label{sec:CPDF-Slider}
+
+Workshop files in \url{https://rstudio.cloud/project/1768881}, subdirectory \\ \texttt{Duke-Co-lab/Shiny/Session-1-NPDHist-CPDF/App/CPDF/ShellExecution/CPDF-FYSliderBar}.  This modification adds a slider bar for automated fiscal year scrolling.  With it, fiscal year is incremented at a constant rate and a new plot is generated for the annual subset of observations.  Longitudinal shifts and patterns become apparent as years advance.  Figure \ref{fg:CPDF-SliderBar} is an example screen-shot of this app. 
+
+Features:
+
+\begin{itemize}
+  \item Use of conditional panel to display FY slider only when FY is not selected as the independent var
+  \item Examine \texttt{sliderInput()} properties, \url{https://shiny.rstudio.com/reference/shiny/0.14/sliderInput.html}
+  \item \texttt{plotly()} sliderInput appears more flexible (BD4RH example)
+  \item Consideration:  what is expected when fiscal year is specified as both the independent and panel variable?
+\end{itemize}
+
+\begin{figure}[h!]
+    \includegraphics[width=6in, trim={0 0 0 0}, clip]{{CPDF-SliderBar}.png}
+    \centering
+    \caption{CPDF employee analysis in Shiny app.  Slider bar for fiscal year animation.}
+    \label{fg:CPDF-SliderBar}
+\end{figure}
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Creating a Pseudo App Server Environment}\label{sec:nav}
+
+\subsection{Combine Several Apps Within a Single \texttt{navbarPage()}}\label{sec:navbarpage}
+
+Workshop files in \url{https://rstudio.cloud/project/1768881}, subdirectory \\ \texttt{Duke-Co-lab/Shiny/Session-1-NPDHist-CPDF/App/NavPage}.
+
+\begin{itemize}
+  \item Advantages
+    \begin{itemize}
+      \item Single file execution
+      \item Consistent, clean menu appearance (figure \ref{fg:navbarPage})
+      \item All R data objects shared between apps
+      \item State of all data objects retained when switching between apps
+    \end{itemize}
+  \item Disadvantages
+    \begin{itemize}
+      \item Scripts for all apps must be combined in a single pair of \texttt{ui()} and \texttt{server()} functions (\texttt{source()} may be useful in maintaining and loading individual files)
+      \item Global variables and functions with a common name must be renamed in order to maintain app independence
+    \end{itemize}
+\end{itemize}
+
+\begin{figure}[h!]
+    \fbox{\includegraphics[width=3in, trim={0 0 0 0}, clip]{{navbarPage}.png}}
+    \centering
+    \caption{Example \texttt{navbarPage()} application that combines apps in a single R and menu environment.}
+    \label{fg:navbarPage}
+\end{figure}
+
+\subsection{Execute Apps Within Individual R Environments}\label{sec:navindivproc}
+
+Using the NPD histogram app of section \ref{sec:NPD-5} and the slider bar app of section \ref{sec:CPDF-Slider}, we note the following:
+
+\begin{itemize}
+    \item Each is launched with a specific tcp port in \texttt{runApp(port=)}
+    \item Each \texttt{ui.r} file contains an HTML anchor tag (\texttt{HTML("<a href=http://127.0.0.1:4292></a>")}) that references the other's port
+    \item The anchor tags appear when each app is launched
+    \item The clickable anchors serve as an entry to an external Shiny app
+    \item Each time an anchor is clicked, the associated Shiny app is executed from it's beginning instruction, clearing memory, making it difficult to compare results in different apps difficult (although open-in-new-tab help)
+    \item \texttt{runApp()} cannot be called from within \texttt{runApp()}, otherwise the scripts we have developed could be executed from within other scripts
+\end{itemize}
+
+\subsection{Execute Apps in Parallel Within a Single R Environment}\label{sec:navparproc}
+
+Workshop files in \url{https://rstudio.cloud/project/1768881}, subdirectory \\ \texttt{Duke-Co-lab/Shiny/Session-1-NPDHist-CPDF/App/Parallel Shiny}.\\
+
+The following script (taken from workshop file App/ParallelShiny/ParallelShiny.r) demonstrates a method of loading individual apps in separate, parallel R processes.
+
+\scriptsize
+\begin{verbatim}
+# Launch two apps in parallel
+# Note that each app specifies a unique tcp port for http requests
+# The uir.r of each app has an anchor tag that targets the other app's listening port
+# This way, one app can execute the other
+
+library(parallel)
+
+# Specify top level directory containing all ui.r and server.r files
+
+# Local dir
+setwd("C:\\Projects\\Duke\\Co-lab\\Shiny\\Session-1-NPDHist-CPDF\\App")
+
+# Rstudio Cloud dir
+#setwd("/cloud/project/Duke-Co-lab/Shiny/Session-1-NPDHist-CPDF/App"
+
+# Define a function, to be called in parallel, that launches the specified app
+execApp <- function(app) {
+
+  library("shiny")
+
+  if(app=="NPDHist") {
+    appDir <- "NPDHist\\ShellExecution"
+    tcpPort <- 4291
+  } else if(app=="CPDF") {
+    appDir <- "CPDF\\ShellExecution\\CPDF-FYSliderBar"
+    tcpPort <- 4292
+  }
+
+  runApp(appDir=appDir,
+  launch.browser=T,
+  host = getOption("shiny.host", "127.0.0.1"),
+  port=tcpPort,
+  display.mode="normal")
+
+}
+
+# Create a two-core parallel cluster
+cl <- makePSOCKcluster(rep("localhost", 2))
+
+# Execute two apps
+clusterApply(cl, c("NPDHist", "CPDF"), execApp)
+
+# Stop cluster
+stopCluster(cl)
+
+# Clean up
+rm(cl)
+gc()
+\end{verbatim}
+\normalsize
+
+\vspace{20pt}
+
+\begin{itemize}
+  \item Notes
+    \begin{itemize}
+      \item The \texttt{execApp()} function executes a Shiny app, responding to a unique tcp port, as instructed by the value of its \texttt{app} parameter
+      \item The \texttt{makePSOCKcluster()} function of the \texttt{parallel} package (alternatively, \texttt{makeSOCKcluster()} of the \texttt{SNOW} package) is used to create a parallel cluster from local processors, one for each Shiny app to be executed
+      \item One core (processor) must be available for each Shiny app to be executed in parallel
+      \item clusterApply() calls \texttt{execApp()} once for the NPDHist app and once for the CPDF app, distributed to individual cores of the cluster
+    \end{itemize}
+  \item Advantages
+    \begin{itemize}
+      \item Individual app \texttt{ui.r} and \texttt{server.r} files are maintained, but all are launched with a single R script (once the \texttt{ui.r} and \texttt{server.r} files are composed, execution requires the above script only)
+      \item Each app functions as an independent http service (can be called from within your Shiny environment or independently from any browser)
+      \item Individual file sets for each app promotes hierarchical program structure and maintainability
+    \end{itemize}
+  \item Disadvantages
+    \begin{itemize}
+      \item Data states are lost when switching between apps
+    \end{itemize}
+\end{itemize}  
+
+\end{spacing}
+
+\end{document} 

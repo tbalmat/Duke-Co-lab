@@ -1,0 +1,622 @@
+\documentclass[10pt, letterpaper]{article}
+\usepackage{setspace}
+\usepackage[letterpaper, margin=1.0in]{geometry}
+\addtolength{\topmargin}{-0.25in}
+%\usepackage{tocloft}
+\usepackage{titlesec}
+%\titleformat*{\section}{\large\bfseries}
+\titleformat*{\section}{\large}
+\titleformat*{\subsection}{\normalsize}
+\usepackage{float} % H causes tables and figures to appear where specified
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{amsmath}   % includes \boldmath(), \boldsymbol{()}
+\usepackage{bm}        % math fonts, \boldmath{}, \boldsymbol{}
+\usepackage{graphicx}
+\usepackage{float}
+\graphicspath{{images/}}
+\usepackage{subcaption}
+\usepackage{xcolor, colortbl}
+\definecolor{gray}{gray}{0.9}
+\definecolor{ltBlue}{rgb}{0.75, 0.85, 0.975}
+\definecolor{medBlue}{rgb}{0.75, 0.8, 0.9}
+\definecolor{white}{rgb}{1, 1, 1}
+%\rowcolor{ltBlue}
+\usepackage{changepage}
+\usepackage{pdflscape}
+\bibliographystyle{plainnat}
+\usepackage[authoryear, round, semicolon]{natbib}
+\newcommand{\mt}[1]{\bm{#1}^{\prime}}
+\newcommand{\mtm}[2]{\bm{#1}^{\prime}\bm{#2}}
+\newcommand{\mi}[1]{\bm{#1}^{-1}}
+\newcommand{\mest}[1]{\hat{\bm{#1}}}
+\usepackage[bottom]{footmisc}
+\setlength{\skip\footins}{12pt}
+\setlength\parindent{0pt}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+}
+% Disable section numbers, so that hyperlinks are enabled
+%\setcounter{secnumdepth}{0}
+
+\title{\Large Co-lab Shiny Workshop\\[6pt]
+       \large Interactive Data Tables and Plots\\[6pt]
+       October 22, 2020\\[20pt]
+       \normalsize thomas.balmat@duke.edu\\[1pt]rescomputing@duke.edu}
+
+%\date{\vspace{-30pt}October 17, 2019}
+\date{}
+%\author{thomas.balmat@duke.edu\\rescomputing@duke.edu}
+
+\begin{document}
+    
+\begin{spacing}{1.0}
+    
+\maketitle
+
+\vspace{-20pt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+R provides a wide range of features and functions for transforming data, analyzing models, and presenting results.  However, to evaluate models and results under a set of possible scenarios, the analyst must iteratively adjust parameter values and manually execute R scripts.  Shiny offers a means of presenting controls (text prompts, selection lists, radio button groups, etc.) on a web page for prompting user input and dynamically integrating the user's web environment with the analytical portion of an R script.  Instead of altering the values of R variables, the user adjusts on-screen graphical controls, R scripts are executed, and results presented, according to the particular Shiny features implemented in your app.\\
+
+Shiny's input objects (\texttt{textInput}, \texttt{selectInput}, \texttt{sliderInput}, etc.) provide a means of presenting, to the user, placeholders for values to be used in an R script for querying data sets, subsetting observations, specifying model parameter values, configuring plot variables, and whatever else may be needed to conduct supported analyses.  Additionally, using an appropriate update function (\texttt{updateSelectInput()}, \texttt{updateRadioButtons()}, etc.) the list of possible values presented to the user can be modified based on ranges of values observed in the data.  Along with a fixed set of controls, we can provide a summarized view of the data, in tabular form, and use each row as a virtual menu entry that, when selected, will advance the user to another level of analysis, limited to data corresponding to that row.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Overview}
+
+\begin{itemize}
+    \item Preliminaries
+      \begin{itemize}
+        \item What can Shiny, interactive data tables, and integrated plots do for you?
+        \item What are your expectations of this workshop?
+      \end{itemize}
+    \item \hyperref[sec:examples]{Examples}
+      \begin{itemize}
+          \item \hyperref[sec:examplevis]{Example visualizations}
+          \item \hyperref[sec:exampleapps]{Example Shiny apps}
+          \item \hyperref[sec:examplesDT]{Example table and plot Shiny apps}
+      \end{itemize}
+    \item \hyperref[sec:resources]{Resources}
+    \item \hyperref[sec:anatomyofapp]{Anatomy of a Shiny App}
+    \item \hyperref[sec:accesworkshopmaterial]{Workshop Material}
+      \begin{itemize}
+        \item \hyperref[sec:materialcloud]{From RStudio Cloud}
+        \item \hyperref[sec:materialgit]{From github (execute locally)}
+      \end{itemize}
+    \item \hyperref[sec:reviewapps]{Review Apps From Previous Session}
+    \begin{itemize}
+      \item \hyperref[sec:reviewappGraphDeliveryMap]{Graph delivery map}
+      \item \hyperref[sec:reviewappOPM]{U.S. Office of Personnel Management (OPM) Central Personnel Data File}
+    \end{itemize}
+    \item \hyperref[sec:HTMLdebug]{HTML and Debugging}
+    \item \hyperref[sec:DTplot]{OPM CPDF Analysis Using Data Tables and Plots}
+      \begin{itemize}
+        \item \hyperref[sec:DTplotR]{Development of analysis in R}
+        \item \hyperref[sec:DTplot-Shiny-1]{Shiny app with basic table and plot controls}
+        \item \hyperref[sec:DTplot-Shiny-2]{Shiny app with additional table and plot features}
+      \end{itemize}
+\end{itemize}
+
+% Shiny server
+% http vs. https
+% Global mem
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Examples}\label{sec:examples}
+
+\subsection{Visualizations}\label{sec:examplevis}
+\begin{itemize}
+    \item \texttt{ggplot} gallery:  \url{https://www.r-graph-gallery.com/all-graphs.html}
+    \item \texttt{ggplot} extensions:  \url{https://mode.com/blog/r-ggplot-extension-packages}
+\end{itemize}
+
+\subsection{Shiny apps}\label{sec:exampleapps}
+\begin{itemize}
+    \item Duke Data+ project, \textit{Big Data for Reproductive Health}, \url{http://bd4rh.rc.duke.edu:3838}
+    \item Duke Data+ project, \textit{Water Quality Explorer}, \url{http://WaterQualityExplorer.rc.duke.edu:3838}
+    \item Duke Med H2P2 Genome Wide Association Study, \url{http://h2p2.oit.duke.edu}
+    \item Duke Nicholas School, \textit{Health Effects of Airborne Pollutants}, \url{http://shindellgroup.rc.duke.edu}
+    \item Duke Nursing School, \textit{Urea Cycle Disorder SNOMED/RxNorm Graph Associations}
+    \item Shiny gallery:  \url{https://shiny.rstudio.com/gallery/}
+\end{itemize}
+
+\subsection{Example Data Table apps}\label{sec:examplesDT}
+
+\begin{itemize}
+    
+    \item Duke H2P2 GWAS phenotypic associations, \url{http://h2p2.oit.duke.edu/PhenotypicAssociations}.  This app queries a large database of phenotypic and genotypic associations, produces a summary table of results in order of significance, and renders a boxplot of individual phenotypic response values corresponding to a single SNP (row) selected from the table.  The plot and data subset can be further examined using on screen controls.
+    
+    \item Shiny gallery, basic data table, \url{https://shiny.rstudio.com/gallery/basic-datatable.html}
+    
+    \item Review your data set on-line, \url{https://shiny.rstudio.com/gallery/file-upload.html}
+    
+    \item Shinyapps.io example, \url{https://yihui.shinyapps.io/DT-rows/}.  This app highlights the plotted point corresponding to a selected data table row.  Note the distinction between client and server side tables.  The documentation for \texttt{renderDataTable()} (\url{https://shiny.rstudio.com/reference/shiny/0.14/renderDataTable.html}) states that only server side tables are implemented.
+    
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Resources}\label{sec:resources}
+
+\begin{itemize}
+
+  \item R
+    \begin{itemize}   
+      \item Books
+        \begin{itemize}
+          \item Norm Matloff, \textit{The Art of R Programming}, No Starch Press
+          \item Wickham and Grolemund, \textit{R for Data Science}, O'Reilly
+          \item Andrews and Wainer, \textit{The Great Migration:  A Graphics Novel}, \url{https://rss.onlinelibrary.wiley.com/doi/pdf/10.1111/j.1740-9713.2017.01070.x}
+          \item Friendly, \textit{A Brief History of Data Visualization}, \url{http://datavis.ca/papers/hbook.pdf}
+        \end{itemize}
+      \item Reference cards
+        \begin{itemize}
+          \item R reference card:  \url{https://cran.r-project.org/doc/contrib/Short-refcard.pdf}
+          \item Base R:  \url{https://rstudio.com/wp-content/uploads/2016/10/r-cheat-sheet-3.pdf}
+          \item Shiny, \texttt{ggplot}, \texttt{markdown}, \texttt{dplyr}, \texttt{tidy}: \url{https://rstudio.com/resources/cheatsheets/}
+        \end{itemize}
+    \end{itemize}
+
+  \item Shiny
+    \begin{itemize}
+        \item \texttt{?shiny} from the R command line
+        \item Click \texttt{shiny} in the \texttt{Packages} tab of RStudio
+        \item \url{https://cran.r-project.org/web/packages/shiny/shiny.pdf}
+    \end{itemize}
+
+  \item \texttt{dataTables}
+    \begin{itemize}
+        \item \texttt{?DT} from the R command line
+        \item Click \texttt{DT} in the \texttt{Packages} tab of RStudio
+        \item \url{https://cran.r-project.org/web/packages/DT/DT.pdf}
+        \item \url{https://rstudio.github.io/DT/}
+        \item java-centric:  \url{https://datatables.net/reference/option/}
+    \end{itemize}
+
+  \item \texttt{ggplot}
+    \begin{itemize}
+        \item \texttt{?ggplot2} from the R command line
+        \item Click \texttt{ggplot2} in the \texttt{Packages} tab of RStudio
+        \item \url{https://cran.r-project.org/web/packages/ggplot2/ggplot2.pdf}
+    \end{itemize}
+
+  \item Workshop material:  \url{https://github.com/tbalmat/Duke-Co-lab/tree/master/Session-2}
+
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Anatomy of a Shiny App}\label{sec:anatomyofapp}
+
+A Shiny app is an R script executing in an active R environment that uses functions available in the Shiny package to interact with a web browser.  The basic components of a Shiny script are
+
+\begin{itemize}
+    \item \texttt{ui()} function
+    \begin{itemize}
+        \item Contains your web page layout and screen objects for inputs (prompt fields) and outputs (graphs, tables, etc.)
+        \item Is specified in a combination of Shiny function calls and raw HTML
+        \item Defines variables that bind web objects to the execution portion of the app
+    \end{itemize}
+    \item \texttt{server()} function
+    \begin{itemize}
+        \item The execution portion of the app
+        \item Contains a combination of standard R statements and function calls, such as to \texttt{apply()}, \texttt{lm()}, \texttt{ggplot()}, etc., along with calls to functions from the Shiny package that enable reading of on-screen values and rendering of results
+    \end{itemize}
+    \item \texttt{runApp()} function
+    \begin{itemize}
+        \item Creates a process listening on a tcp port, launches a browser (optional), renders a screen by calling the specified \texttt{ui()} function, then executes the R commands in the specified server() function
+    \end{itemize}
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Workshop Material}\label{sec:accesworkshopmaterial}
+
+\subsection{RStudio Cloud}\label{sec:materialcloud}
+
+\begin{itemize}
+    \item What is RStudio Cloud?
+    \begin{itemize}
+        \item \textit{We} {[RStudio]} \textit{created RStudio Cloud to make it easy for professionals, hobbyists, trainers, teachers and students to do, share, teach and learn data science using R.}
+    \end{itemize}
+    \item With RStudio Cloud
+    \begin{itemize}
+        \item You do not need RStudio installed locally
+        \item Packages, example scripts, and data sets needed for the Shiny workshop are available in the Cloud environment
+    \end{itemize}
+    \item Access workshop material
+    \begin{itemize}
+        \item Create an account:  \url{https://rstudio.cloud}
+        \item Create a convenient directory structure in your project
+        \item Copy workshop materials
+        \begin{itemize}
+            \item Go to \url{https://rstudio.cloud/project/1768881} (Duke-Co-lab/Shiny directory)
+            \item Export a sub-directory
+            \begin{figure}[H]
+                \frame{\includegraphics[width=3.5in, trim={0 0 0 0.0}, clip]{{RStudioCloudExport}.png}}
+                \centering
+                %\caption{}
+                \label{fig:RStudioCloudExport}
+            \end{figure}
+            \item Save to your computer
+            \item Upload saved zip file to your RStudio Cloud project
+            \begin{figure}[H]
+                \frame{\includegraphics[width=3.5in, trim={0 0 0 0.0}, clip]{{RStudioCloudUpload}.png}}
+                \centering
+                %\caption{}
+                \label{fig:RStudioCloudUpload}
+            \end{figure}
+        \end{itemize}
+        \item Install packages:
+        \begin{itemize}
+            \item Shiny:  \texttt{install.packages("shiny")}
+            \item ggplot:  \texttt{install.packages("ggplot2")}
+            \item Data Tables: \texttt{install.packages("DT")}
+        \end{itemize}
+    \end{itemize}
+    \item All workshop scripts should function in RStudio Cloud, except OS shells that are used to automate execution
+\end{itemize}
+
+\subsection{Execute locally (copy workshop material from github repo)}\label{sec:materialgit}
+
+\begin{itemize}
+    \item Copy scripts and data from \url{https://github.com/tbalmat/Duke-Co-lab/tree/master/Session-1}
+    \item In a separate directory, copy scripts and data from \url{https://github.com/tbalmat/Duke-Co-lab/tree/master/Session-2}
+        \item Install packages:
+        \begin{itemize}
+            \item Shiny:  \texttt{install.packages("shiny")}
+            \item ggplot:  \texttt{install.packages("ggplot2")}
+            \item Data Tables: \texttt{install.packages("DT")}
+        \end{itemize}
+    \item All workshop scripts should function locally
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Review Apps from Previous Session}\label{sec:reviewapps}
+    
+\subsection{Graph delivery map}\label{sec:reviewappGraphDeliveryMap}
+
+Material:
+\begin{itemize}
+    \item \url{https://rstudio.cloud/project/1768881} (Duke-Co-lab/Shiny/GraphDeliverMap subdirectory)
+    \item \url{https://github.com/tbalmat/Duke-Co-lab/tree/master/Examples/GraphDeliveryMap}
+\end{itemize}
+
+This is a geographical location cluster modeling app that simulates a production facility, demand sites (customers), and carriers who make deliveries.  Customer locations are clustered using the \texttt{kmeans()} function and carriers are assigned to clusters based on nearest proximity.  Key features are:
+
+\begin{itemize}
+    \item Use of \texttt{map\_data()} for U.S. state boundaries
+    \item \texttt{geom\_polygon()} for display of state boundaries
+    \item User selectable inputs for number of carriers and customers and service area latitude, longitude, and service area radius
+    \item Input controls are reactive, so that changes on-screen cause immediate re-simulation of demand, clusters, and map
+    \item Colors and shapes specified in \texttt{ggplot()} to distinguish clusters, facility, carrier, and regional centers
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{OPM Central Personnel Data File}\label{sec:reviewappOPM}
+
+\begin{itemize}
+  \item Material
+  \begin{itemize}
+      \item RStudio Cloud
+      \begin{itemize}
+          \item Outline: \url{https://rstudio.cloud/project/1768881} (Duke-Co-lab/Shiny/Session-1-NPDHist-CPDF/CourseMaterial/Outline directory)
+          \item Scripts: \url{https://rstudio.cloud/project/1768881} (Duke-Co-lab/Shiny/Session-1-NPDHist-CPDF/App/CPDF directory)
+      \end{itemize}
+      \item git
+      \begin{itemize}
+        \item Outline: \url{https://github.com/tbalmat/Duke-Co-lab/blob/master/Session-1/CourseOutline}
+        \item Scripts: \url{https://github.com/tbalmat/Duke-Co-lab/blob/master/Session-1/App/CPDF}
+      \end{itemize}
+  \end{itemize}
+  \item Discussion:  CourseOutline/Co-lab-Session-1-NPDHist-CPDF.pdf, section 11 
+  \item Development of analysis in R, section 11.1
+    \begin{itemize}
+      \item Required libraries
+      \item Use of \texttt{lapply()} as the \texttt{by} parameter of \texttt{aggregate()}
+      \item \texttt{ggplot()} features
+        \begin{itemize}
+          \item Conditional, stepwise construction of plot (\texttt{g <- g + ...})
+          \item \texttt{aes\_string()} is used for aesthetic declaration, since supplied variables contain text referencing actual variable names
+          \item \texttt{size} and \texttt{color} are specified as aesthetics
+          \item \texttt{facet\_wrap} is specified with \texttt{panelVar}, as opposed to \texttt{~panelVar}, since \item \texttt{panelVar} contains text referencing the actual variable to panel by
+          \item Panel labels are customized using \texttt{as\_labeller()}
+          \item Axis labels are formatted with a function
+          \item A prepared theme (\texttt{ggTheme}, a list) is used to control general appearance 
+        \end{itemize}
+    \end{itemize}
+  \item Shiny app, version 1:  section 11.2
+    \begin{itemize}
+      \item Considerations
+        \begin{itemize}
+          \item Required libraries
+          \item Maintaining \texttt{ui()} and \texttt{server()} functions in separate files
+          \item \texttt{runApp()} features
+            \begin{itemize}
+              \item \texttt{launch.browser=T}
+              \item \texttt{appDir}
+              \item \texttt{host}
+              \item \texttt{port}
+            \end{itemize}
+          \item Terminating the app (esc key, stop sign)
+          \item Residual browser effects
+          \item \texttt{ui()} features
+            \begin{itemize}
+              \item \texttt{fluidPage()}
+              \item \texttt{tabsetPanel}
+              \item \texttt{sidebarPanel}
+              \item \texttt{fluidRow()}
+              \item \texttt{column()}
+              \item Use of \texttt{HTML()}
+              \item Common error (\texttt{"Warning: Error in tag: argument is missing, with no default"}) when delimiting comma missing between parameters of \texttt{fluidPage()}, \texttt{fluidRow}, \texttt{column()}, etc.
+              \item The \texttt{Agency} selection list is constructed from values observed in the data
+            \end{itemize}
+        \item \texttt{server()} features
+          \begin{itemize}
+            \item Since referencing \texttt{input\$variableName} within \texttt{renderDataTable()} or \texttt{renderPlot()} establishes a \textit{reactive} environment, where the associated table or plot would be instantaneously updated whenever \texttt{input\$variableName} is modified, we instead use \texttt{observeEvent()} functions bound to action buttons and pass \texttt{input\$variableName} to separate functions for data aggregation and plot generation.
+          \end{itemize}
+        \item Communicating with your app:  \texttt{print()} and \texttt{cat()}
+      \end{itemize}
+  \end{itemize}
+  \item Shiny app, version 2:  section 11.3
+    \begin{itemize}
+      \item \texttt{ui()} features
+        \begin{itemize}
+          \item Conditional panel to hide slider bar (\texttt{t1PlotSlider}) when graph independent variable is FY
+          \item \texttt{t1PlotSlider} is configured with animation options with a timer interval of 500 ms
+        \end{itemize}
+      \item \texttt{server()} features
+        \begin{itemize}
+          \item An observe event for \texttt{t1PlotSlider} generates a plot for each year in the slider range, in 500 ms intervals (it would be interesting to update this interval dynamically) 
+          \item \texttt{ignoreInit=T} is specified for the \texttt{t1PlotSlider} observe event, which prevents rendering of a plot as the slider transitions from NULL to 1988 during initialization
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{HTML and Debugging}\label{sec:HTMLdebug}
+
+Sections 9 and 10 of \textit{Co-lab-Session-1-NPDHist-CPDF.pdf}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{OPM CPDF Analysis Using Data Tables and Plots}\label{sec:DTplot}
+
+The OPM Central Personnel Data File (CPDF) data set includes human capital characteristics on full-time U.S. federal employees in the GS pay plan.  The data were sourced from Buzzfeed, who received it from OPM in response to a FOIA request.\footnote{For information on Buzzfeed and their hosting of these data, see \url{https://www.buzzfeednews.com/article/jsvine/sharing-hundreds-of-millions-of-federal-payroll-records}}  Table \ref{tb:buzzfeeddata} lists the variables included in the data.\footnote{Additional information on CPDF data elements is available in the OPM Guide to Data Standards \url{https://www.opm.gov/policy-data-oversight/data-analysis-documentation/data-policy-guidance/reporting-guidance/part-a-human-resources.pdf}}\\
+
+Restrictions on observations used are:
+
+\begin{itemize}[noitemsep]
+    \item FY between 1988 and 2011
+    \item WorkSchedule=F
+    \item PayPlan=GS
+    \item Grade between 01 and 15
+    \item OccupationCategory in {P, A, T, C, O}
+    \item EducationLevel between 01 and 22
+    \item AdjustedBasicPay $>$ 10 (thousands per year)
+    \item Top five agencies (left two positions) by observation frequency
+\end{itemize}
+
+\begin{table}[h!]
+    \caption{Buzzfeed OPM data set}
+    \centering
+    \begin{tabular}{ll}
+        \hline & \\[-8pt]
+        Column & Description \\[1pt]
+        \hline & \\[-4pt]
+        PseudoID & unique (OPM randomly assigned) employee ID \\
+        FY & U.S. federal government fiscal year \\
+        Agency & federal agency employed (synthetically generated for workshop) \\
+        Grade & general schedule (GS) grade \\
+        OccupationalCategory & occupational category \\ 
+        Occupation & occupation \\
+        Age & employee age (five year increments, noised induced by OPM) \\
+        EducationYears & years of education \\
+        BasicPay & adjusted basic pay, in 2011 \$U.S. \\
+    \end{tabular}
+    \label{tb:buzzfeeddata}
+\end{table}
+
+To analyze the CPDF observations, we might summarize median pay by agency and occupation in a table with one row per agency, occupation combination.  When a row is selected, we can advance the user to a plot configuration screen where various relationships between pay, fiscal year, grade, education, and age can be viewed for the selected agency, occupation observation subset.  This approach separates the analysis into two phases:  a summary phase to present the structure of the data and an investigation phase to explore relationships within key data subsets identified in the summary phase. 
+
+%%%%%%%%
+
+\subsection{Development of analysis in R (V1)}\label{sec:DTplotR}
+
+Script location (RStudio Cloud): \url{https://rstudio.cloud/project/1768881}\\
+File: Duke-Co-lab/Shiny/Session-2-DataTables-Plots/App/V1/CPDF-Tables-1.r\\
+
+Important features of federal employee human capital include a general increase in age, education, pay grade, and pay throughout the study period, along with a decrease in proportion persons occupying clerical positions (occupational category ``C") and an increase in proportion persons occupying professional and administrative positions (occupational categories ``P" and ``A").  These trends should be clearly revealed in our app. The R script for development and analysis is in workshop file /App/V1/CPDF-Tables-1.r.  Features and considerations include (line numbers are approximate):
+
+\begin{itemize}
+    \item (lines 53-55) For demonstration and to limit data load time, one of four data sets is randomly selected, each containing observations for a randomly selected set of approximately one fourth of the total number of employees represented in the data
+    \item (lines 92-122) A table (data frame labeled \texttt{aggdat}) of aggregated mean and quartiles is constructed using specified dependent and independent variables
+    \item (lines 125-164) An alternative aggregation method truncates \texttt{agency} and \texttt{occupation} to two positions (to achieve a high level of aggregation)
+    \item (lines 175) One row is selected from \texttt{aggdat} and the observations corresponding to the specified independent variables are subset from the disaggregated data set (all observations)
+    \item (line 178) An independent (x-axis) variable for the graph is specified (in \texttt{gindepVar}) that is different from any used in the aggregation step
+    \item (lines 180-187) A data frame is prepared to be used as the data source of \texttt{ggplot()}
+    \item (lines 184, 186) \texttt{gindepVar} is coerced to a factor to avoid the problem of \texttt{ggplot()} producing a single element x-axis when x (\texttt{gindepVar}) is continuous
+    \item(line 186)  Occupational category, if specified as an aggregation or graphical independent variable, is coerced to a factor with levels specified in the standard order P, A, T, C, O, for proper appearance
+    \item (lines 189-196) The plot (\texttt{g}) is constructed in a step-wise manner, as a template for applying further conditional geoms and appearance features
+    \item (lines 200-280) A more developed plot is prepared that is closer to what is needed for the Shiny app.  Features include:
+    \begin{itemize}
+        \item Faceting based on a specified panel variable (\texttt{panelVar})
+        \item Specification of the number of panel rows or columns to arrange (\texttt{panelRows}, \texttt{panelCols})
+        \item Ability to display points for individual observations (\texttt{pointDisplay})
+        \item Ability to specify point transparency (\texttt{pointAlpha}) to diminish the effect of point overlay
+        \item Ability to specify a point coloration variable (\texttt{diffVar}) to aid in distinguishing categories of observations 
+        \item (lines 250-260) Jitter (\texttt{geom\_jitter()}) is added in the x-dimension to diminish the effect of point overlay
+        \item (line 257) The point color aesthetic is implemented by direct editing of the list produced by \texttt{ggplot()}, but only if \texttt{diffVar} is non-empty.  This is an example of conditional geom modification.
+        \item (line 258) Actual point category colors are generated using a \texttt{colorRampPalette} from blue to red
+        \item (line 263) Normal display of outlier points is suppressed in \texttt{geom\_boxplot()}
+        \item (line 264) Error bars (\texttt{stat\_boxplot()}) are included to indicate the inter-quartile range of each independent variable level
+        \item (line 269) A custom function is defined to label facet panels
+        \item (line 273) A previously prepared theme (\texttt{ggTheme}) is used to control overall plot appearance
+    \end{itemize}
+    \item (line 280) Examining the structure of a composed \texttt{ggplot()} list reveals the inner structure of a plot and which list elements affect particular plot features, along with an idea of the behavior achieved by using certain parameter values (examination of \texttt{g} revealed the element \texttt{g[["layers"]][[length(g[["layers"]])]] [["mapping"]][["colour"]]}, used on line 257 to apply the color aesthetic for \texttt{diffVar})
+\end{itemize}
+
+Figure \ref{fg:V1FYPanelGradeVEd} is an example plot from this analysis.  It reveals the expected general change (increase) in employee grade vs. education, within the Department of Health and Human Services, for occupation code 02, in fiscal years 1988-2011.  The expected reduction in clerical positions (occupational category ``C") throughout this period is also noticeable.\\
+
+\begin{figure}[H]
+    \includegraphics[width=3.25in, trim={0 0 0 0}, clip]{{V1FYPanelGradeVEd}.png}
+    \centering
+    \caption{Change in employee grade, given education, along with change in distribution of occupational category, Health and Human Services, occupation code 02, FYs 1988-2011}
+    \label{fg:V1FYPanelGradeVEd}
+\end{figure}
+
+\clearpage
+
+%%%%%%%%%
+
+\subsection{Shiny app with basic table and plot controls (V2)}\label{sec:DTplot-Shiny-1}
+
+Script location (RStudio Cloud): \url{https://rstudio.cloud/project/1768881}\\
+File: Duke-Co-lab/Shiny/Session-2-DataTables-Plots/App/V2/CPDF-Tables-2.r\\
+
+The analysis of section \ref{sec:DTplotR}, implemented in R, reveals important features of federal employee human capital.  To expedite  and broaden the scope analysis of these data, we will develop a Shiny app that produces a summary table for specified dependent and independent variables.  From the table, a row can be selected to subset observations for detailed plotting.  Plot configuration includes controls to specify variables for the graph independent (x-axis) variable, paneling, and point category coloration.  Additional controls are included for panel layout (rows/columns), point size, point jitter, and point transparency.  Features and considerations include (line numbers are approximate):
+
+\begin{itemize}
+
+    \item User interface (file \texttt{ui.r})
+      \begin{itemize}
+        \item (lines 57-60) A subset of observations is assembled corresponding to approximately one fourth of the employees represented in the data
+        \item (lines 62-66) Record cleaning is accomplished
+        \item (lines 70, 127) An agency selection list is constructed from agencies appearing in the data (disabled in this version)
+        \item (line 92) A \texttt{tabsetPanel} is configured for two tabs
+        \item (lines 94-116) The aggregation and selection tab (\texttt{t1}) is defined
+        \item (line 103) Multiple independent variables are selectable simultaneously (\texttt{t1IndepVar}).  Note that the selection list is static.  It can also be composed from the column names of the input data (as with \texttt{t2AgencyFilter} and \texttt{agencyList}).
+        \item (line 109) An action button (\texttt{t1ActionComposeTable}) is defined for initiating table construction
+        \item (line 114) The data table object (\texttt{t1Table}) is defined (selecting a row will activate the plot tab)
+        \item (lines 118-168) The plot configuration and review tab (\texttt{t2}) is defined
+        \item (line 147) An action button (\texttt{t2ActionPlot}) is defined for initiating plot construction
+        \item (line 156) The plot object (\texttt{t2Plot}) is defined (this is where plots will be displayed)
+        \item (line 164) A text output line (\texttt{t2Msg}) is defined for messaging
+      \end{itemize}
+
+    \item Server (file \texttt{server.r})
+      \begin{itemize}
+        \item (lines 55-134) An observe event is defined for the action button \texttt{t1ActionComposeTable}.  This event is executed whenever the state of the button changes (when it is clicked).
+        \item (line 62) It is confirmed that a dependent and at least one independent variable are selected.  If violated, then (lines 128-129) the table is set to NULL (it disappears) and a message is displayed).
+        \item (lines 64-78) Observation subset indices are composed for each combination of levels of the independent variable(s) specified on the table tab (\texttt{t1IndepVar}).  The result (\texttt{iagg}) is a list with one element per independent var level combination and is saved as a global variable to be made available outside of current function.  Note the use of \texttt{lapply()} for the \texttt{by()} clause of \texttt{aggregate()}.  A list is required here and it will contain one element per independent variable.  This is responsible for observation subsetting.
+        \item (line 80) Subset index validation is accomplished
+        \item (lines 82-95) Observation count, mean, and quartiles are aggregated for each index subset.  \item \texttt{apply()} proceeds through each set of indices in \texttt{iagg} and produces a list of data frames that are then flattened into a single data frame (\texttt{aggdat}).
+        \item (line 97) \texttt{aggdat} validation is accomplished
+        \item (lines 99-110) A data table is constructed and rendered (in \texttt{t1Table}), using \texttt{aggdat} results.  Features include (this might be a good time to review the \texttt{dataTables} and \texttt{renderDataTable()} documentation listed in section \ref{sec:resources}):
+          \begin{itemize}
+              \item Fixed page length (100) with no page length adjustment object (\texttt{bLengthChange=F})
+              \item The global table search tool is disabled (bFilter=F)
+              \item Single row selection (multiple rows are possible, yielding a list that grows with selection, until it is reset)
+              \item Automatic column width assignment (based on max width of contained data)
+              \item The order of the second column is set to ascending (note that col IDs are 0-based)
+          \end{itemize}
+      \item (lines 112-129) Messages are displayed to the user if no observations exist corresponding to the input subset parameter values
+        \item (lines 137-234) A function is defined to generate a plot based on a selected \texttt{aggdat} table row and configuration parameter values taken from the plot configuration tab (\texttt{t2}).  Features include:
+          \begin{itemize}
+              \item (lines 144-148) Dependent, independent, and aggregation variables are validated (specification of a single variable as having multiple roles indicates an invalid plot structure).  Invalidation causes a NULL plot to be returned, along with display of an error message (lines 220-232)
+              \item (line 151) The observation subset indices corresponding to the selected row are retrieved
+              \item (lines 153-176) A plot source data frame (\texttt{gdat}) is composed from the subset observations.  Variables are converted to factors as needed and occupation category is order according to standard.
+              \item (lines 178-215) A composite box plot with overlayed points (for individual observation sin the data subset) is composed
+              \item (lines 183-184) Points are displayed with x-jitter to aid in distinguishing multiple points at shared coordinates.  Note the use of \texttt{aes\_string()}, since the x and y coordinates are contained in \texttt{gdat} indicated by \texttt{indepVar} and \texttt{depVar} (use of \texttt{aes()} would cause a search of \texttt{"indepVar"} and \texttt{"depVar"} in the column names of \texttt{gdat}).
+              \item (lines 185-194) The color differentiation aesthetic is assigned by direct editing of the \texttt{ggplot()} result list.  This is an alternative to complex use of various \texttt{aes()} calls when aesthetics are conditional (two conditional aesthetics, one for color and one for size, would require four separate \texttt{aes()} calls embedded in if-then-else statements; three aesthetics would require eight statements, etc.).
+              \item (line 197) The box plot is generated with outliers suppressed (perhaps this should be done only when points are requested)
+              \item (line 198) error bars are included (although specified with fixed color and width, these can be made adjustable with additional on-screen controls)
+              \item (lines 200-210) Panels are produced, one for each level of a specified variable.  A custom labeler function is specified.
+              \item (lines 212-215) Y-axis labels are formatted (thousands) and a previously prepared theme is applied
+              \item (line 218) The plot is rendered (displayed in \texttt{t2Plot})
+              \item (lines 237-259) An action event is defined to \texttt{t1Table} row selection
+              \item (line 246) The selected row ID is saved in a global variable (\texttt{t1SelectedRow}) so that other functions may reference the currently selected row
+              \item (lines 248-253) A call to \texttt{t2RenderPlot} is made to compose and display a plot using the selected table row id and the current values of on screen objects.  Note that the values of Shiny variables (preceded by \texttt{input\$}) are passed as parameters instead of directly referencing Shiny variables within \texttt{t2RenderPlot} to avoid any possible attempt to create a reactive environment,  where \texttt{t2RenderPlot} might be called when a Shiny variable is modified (this is not supposed to occur, but it does)
+              \item (line 256) Make the plot tab (\texttt{t2}) active, so that the user can view and configure the resulting plot
+              \item (lines 262-279) An action event is defined for the \texttt{t2ActionPlot} button.  This renders a plot using the previously specified table row (\texttt{t1SelectedRow}) and current on-screen parameter values
+          \end{itemize}
+      \end{itemize}
+
+\end{itemize}
+
+Figure \ref{fg:V2-Screenshot-Table} is an example screen shot of the aggregated summary table tab of the V2 app.  Row highlighting indicates an observation subset (agency VA and occupation 09 here) selected for plotting.  Figure \ref{fg:V2-Screenshot-Plot} is an example screen shot of the plotting tab, with a plot composed from the observation subset corresponding to the row selected in figure \ref{fg:V2-Screenshot-Table}.\\
+
+\begin{figure}[H]
+    \includegraphics[width=5in, trim={0 0 0 0}, clip]{{V2-Screenshot-Table}.png}
+    \centering
+    \caption{Screen shot of V2 CPDF Shiny app, aggregated summary table tab}
+    \label{fg:V2-Screenshot-Table}
+\end{figure}
+
+\vspace{0.25in}
+
+\begin{figure}[H]
+    \includegraphics[width=5.5in, trim={0 0 0 0}, clip]{{V2-Screenshot-Plot}.png}
+    \centering
+    \caption{Screen shot of V2 CPDF Shiny app, plot configuration  tab}
+    \label{fg:V2-Screenshot-Plot}
+\end{figure}
+
+\clearpage
+
+Observations using the aggregation table:
+
+\begin{itemize}
+    \item Aggregation of grade by fiscal year reveals a pattern of increased grade by, with median grade exhibiting greater increase than mean grade (does this indicate a widening of grade distribution with a tail forming for upper grades?)
+    \item Aggregation of age by fiscal year reveals a pattern of increased age, indicating an older (more experienced?) workforce at the end of the study period
+    \item Aggregation of education by fiscal indicates an increase in mean and median education over the study period
+    \item Aggregation of grade by agency and occupational category indicates that VA employees tend to have lower grade than employees of similar category in other agencies 
+\end{itemize}
+
+How can the plot tab be used to investigate the above observations to reveal differences between agencies, occupational categories, fiscal years, and so forth?  Note that it would be interesting to explore a data table of grade aggregated by occupational category, then plot with fiscal year as the independent variable and agency as a panel variable.  However, although our app allows truncation of agency on the aggregation tab, it does not on the plot tab.  Therefore, panels are constructed of individual plots using four position agency codes, giving a somewhat detailed view.  Yet, individual agencies with general increase in grade over the period are easily identified for each selected occupational category, which is informative.
+
+%%%%%%%%%
+
+\subsection{Shiny app with additional table and plot features (V3)}\label{sec:DTplot-Shiny-2}
+
+Script location (RStudio Cloud): \url{https://rstudio.cloud/project/1768881}\\
+File: Duke-Co-lab/Shiny/Session-2-DataTables-Plots/App/V3/CPDF-Tables-3.r\\
+
+This version of the app implements the following features (affected script locations are indicated as u-nnn-ppp or s-nnn-ppp, where u indicates ui.r, s indicates server.r, nnn indicates the approximate beginning line number, and ppp indicates the approximate ending line number):
+
+\begin{itemize}
+    \item Table features
+    \begin{itemize}
+        \item (u-88) Browser tab title added
+        \item (u-90-95) Notification window formatted and moved to the center of the screen
+        \item (s-78-245) Table construction converted to a callable function
+        \item (s-234, 241) Query criteria errors reported using \texttt{showNotification()} with \texttt{type="error"} 
+        \item (s-203) Default rows per page modified
+        \item (s-185-197) Rows per page adjustment control enabled
+        \item (s-185-197, 206) Global table search function enabled (with regex capability)
+        \item (s-178, 185-197, 225) csv download feature implemented
+        \item (s-122-134) HTML anchor tags implemented for agency and occupation links to reference sources
+        \item (s-156-159, 405-443) Row selection converted to cell selection (to prevent plot generation when clicking an anchor)
+        \item (s-217-222) Default order of rows limited to columns corresponding to independent variables
+        \item (s-141-145, 211-213) Numeric columns formatted
+        \item (s-161-166) Column headers customized with HTML
+        \item (s-169) Cell editing enabled
+        \item (s-175) Column search fields enabled
+        \item (s-147-150) HTML formatted caption displayed (composed from selected dependent and independent variables)
+    \end{itemize}
+    \item Plot features
+    \begin{itemize}
+        \item (s-364, 371) Errors reported using \texttt{showNotification()} with \texttt{type="error"}
+        \item (s-356-358) Progress indicator is displayed during rendering
+        \item (s-258-262, 376) Existing plot cleared prior to rendering new one (attempted)
+        \item (s-335-347) Observation subset count displayed in each facet panel
+        \item (u-148-149, s-304) Box intensity control added
+        \item (u-150-151, s-316-324) Point display (yes/no) control replaced with option for fixed or variable sized points (variable size are based on independent variable category frequency)
+    \end{itemize}
+\end{itemize}
+
+
+
+\end{spacing}
+
+\end{document} 

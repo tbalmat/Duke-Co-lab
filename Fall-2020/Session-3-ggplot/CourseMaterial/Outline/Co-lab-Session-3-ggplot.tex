@@ -1,0 +1,421 @@
+\documentclass[10pt, letterpaper]{article}
+\usepackage{setspace}
+\usepackage[letterpaper, margin=1.0in]{geometry}
+\addtolength{\topmargin}{-0.25in}
+%\usepackage{tocloft}
+\usepackage{titlesec}
+%\titleformat*{\section}{\large\bfseries}
+\titleformat*{\section}{\large}
+\titleformat*{\subsection}{\normalsize}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{amsmath}   % includes \boldmath(), \boldsymbol{()}
+\usepackage{bm}        % math fonts, \boldmath{}, \boldsymbol{}
+\usepackage{graphicx}
+\usepackage{float}
+\graphicspath{{images/}}
+\usepackage{subcaption}
+\usepackage{xcolor, colortbl}
+\definecolor{gray}{gray}{0.9}
+\definecolor{ltBlue}{rgb}{0.75, 0.85, 0.975}
+\definecolor{medBlue}{rgb}{0.75, 0.8, 0.9}
+\definecolor{white}{rgb}{1, 1, 1}
+%\rowcolor{ltBlue}
+\usepackage{changepage}
+\usepackage{pdflscape}
+\bibliographystyle{plainnat}
+\usepackage[authoryear, round, semicolon]{natbib}
+\newcommand{\mt}[1]{\bm{#1}^{\prime}}
+\newcommand{\mtm}[2]{\bm{#1}^{\prime}\bm{#2}}
+\newcommand{\mi}[1]{\bm{#1}^{-1}}
+\newcommand{\mest}[1]{\hat{\bm{#1}}}
+\usepackage[bottom]{footmisc}
+\setlength{\skip\footins}{12pt}
+\setlength\parindent{0pt}
+%\usepackage{breakurl}
+\usepackage{url}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+}
+% Disable section numbers, so that hyperlinks are enabled
+%\setcounter{secnumdepth}{0}
+
+\title{\Large Co-lab Shiny Workshop\\[6pt]
+       \large Integrating Shiny and \texttt{ggplot}\\[6pt]
+       October 29, 2020\\[20pt]
+       \normalsize thomas.balmat@duke.edu\\[1pt]rescomputing@duke.edu}
+
+%\date{\vspace{-30pt}October 17, 2019}
+\date{}
+%\author{thomas.balmat@duke.edu\\rescomputing@duke.edu}
+
+\begin{document}
+    
+\begin{spacing}{1.0}
+    
+\maketitle
+
+\vspace{-20pt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In previous sessions of the series, we used features of Shiny and \texttt{ggplot} to accept input from a user and, in the context of analyses implemented, present informative results intended to guide the analyst through further exploration of the data.  One strength of a Shiny app is that analyses, tables, and graphs are prepared with no requirement from the user other than to ``fill out" the input form and wait a moment in anticipation for results.  The ease of iterative adjustment of on-screen controls and review promotes idea generation and validation, making a well designed Shiny app a resource for exploratory research of data.  In this session, we will further our use of \texttt{ggplot} ``geoms" and controls for faceting (creating multi-panel plots), controlling aesthetics (defining which visual elements are colored, sized, etc., based on their corresponding variable levels), configuring axes, and adjusting overall appearance using themes.  Each control is specifically designed to improve the viewer's understanding of various distributions of and relationships between covariates in the study data.  The topic of this session is U.S. domestic air travel and variables include frequency of flights by origin and destination city; flights by weekday and month; and departure delay by carrier, weekday, and month.  Because we are using \texttt{ggplot} in a Shiny context, our emphasis will be on binding on-screen controls to R script variables that are used to initialize values of various \texttt{ggplot} function parameters.    
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Overview}
+
+\begin{itemize}
+    \item Preliminaries
+      \begin{itemize}[noitemsep]
+        \item What can Shiny and \texttt{ggplot} do for you?
+        \item What are your expectations of this workshop?
+      \end{itemize}
+    \item \hyperref[sec:examples]{Examples}
+      \begin{itemize}[noitemsep]
+        \item \hyperref[sec:examplevis]{Example \texttt{ggplot} visualizations}
+        \item \hyperref[sec:exampleapps]{Example Shiny apps}
+      \end{itemize}
+    \item \hyperref[sec:resources]{Resources}
+    \item \hyperref[sec:anatomyofapp]{Anatomy of a Shiny app}
+    \item \hyperref[sec:accesworkshopmaterial]{Workshop material}
+      \begin{itemize}[noitemsep]
+        \item \hyperref[sec:materialcloud]{From RStudio Cloud}
+        \item \hyperref[sec:materialgit]{From github (execute locally)}
+      \end{itemize}
+    \item \hyperref[sec:reviewapp]{Review previous app, data tables and the OPM Central Personnel Data File, V3}
+    \item \hyperref[sec:flightapp]{U.S. commercial flight app using \texttt{ggplot} and \texttt{ggridges}}
+      \begin{itemize}[noitemsep]
+        \item \texttt{ui.r}
+        \item \texttt{server.r}
+        \item U.S. domestic flight map (\texttt{ggplot})
+        \item Flight departure delay distribution (\texttt{ggridges})
+      \end{itemize}
+    \item \hyperref[sec:debugging]{Debugging}
+\end{itemize}
+
+% Shiny server
+% http vs. https
+% Global mem
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Examples}\label{sec:examples}
+
+\subsection{Visualizations}\label{sec:examplevis}
+\begin{itemize}[noitemsep]
+    \item \texttt{ggplot} gallery:  \url{https://www.r-graph-gallery.com/all-graphs.html}
+    \item \texttt{ggplot} extensions:  \url{https://mode.com/blog/r-ggplot-extension-packages}
+\end{itemize}
+
+\subsection{Shiny apps}\label{sec:exampleapps}
+\begin{itemize}[noitemsep]
+    \item Duke Data+ project, \textit{Big Data for Reproductive Health}, \url{http://bd4rh.rc.duke.edu:3838}
+    \item Duke Data+ project, \textit{Water Quality Explorer}, \url{http://WaterQualityExplorer.rc.duke.edu:3838}
+    \item Duke Med H2P2 Genome Wide Association Study, \url{http://h2p2.oit.duke.edu}
+    \item Duke Nicholas School, \textit{Health Effects of Airborne Pollutants}, \url{http://shindellgroup.rc.duke.edu}
+    \item Duke Nursing School, \textit{Urea Cycle Disorder SNOMED/RxNorm Graph Associations}
+    \item Shiny gallery:  \url{https://shiny.rstudio.com/gallery/}
+    \item NCSU Institute for Advanced Analytics intro:  \url{https://www.csc2.ncsu.edu/faculty/healey/msa-17/shiny/}
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Resources}\label{sec:resources}
+
+\begin{itemize}
+
+  \item R
+    \begin{itemize}   
+      \item Books
+        \begin{itemize}[noitemsep]
+          \item Norm Matloff, \textit{The Art of R Programming}, No Starch Press
+          \item Wickham and Grolemund, \textit{R for Data Science}, O'Reilly
+          \item Andrews and Wainer, \textit{The Great Migration:  A Graphics Novel}, \url{https://rss.onlinelibrary.wiley.com/doi/pdf/10.1111/j.1740-9713.2017.01070.x}
+          \item Friendly, \textit{A Brief History of Data Visualization}, \url{http://datavis.ca/papers/hbook.pdf}
+        \end{itemize}
+      \item Reference cards
+        \begin{itemize}[noitemsep]
+          \item R reference card:  \url{https://cran.r-project.org/doc/contrib/Short-refcard.pdf}
+          \item Base R:  \url{https://rstudio.com/wp-content/uploads/2016/10/r-cheat-sheet-3.pdf}
+          \item Shiny, \texttt{ggplot}, \texttt{markdown}, \texttt{dplyr}, \texttt{tidy}: \url{https://rstudio.com/resources/cheatsheets/}
+        \end{itemize}
+    \end{itemize}
+
+  \item Shiny
+    \begin{itemize}[noitemsep]
+        \item \texttt{?shiny} from the R command line
+        \item Click \texttt{shiny} in the \texttt{Packages} tab of RStudio
+        \item \url{https://cran.r-project.org/web/packages/shiny/shiny.pdf}
+    \end{itemize}
+
+  \item \texttt{ggplot}
+    \begin{itemize}[noitemsep]
+        \item \texttt{?ggplot2} from the R command line
+        \item Click \texttt{ggplot2} in the \texttt{Packages} tab of RStudio
+        \item \url{https://cran.r-project.org/web/packages/ggplot2/ggplot2.pdf}
+    \end{itemize}
+
+  \item Workshop materials
+    \begin{itemize}[noitemsep]
+        \item \url{https://github.com/tbalmat/Duke-Co-lab/tree/master/Session-3}
+    \end{itemize}
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Anatomy of a Shiny app}\label{sec:anatomyofapp}
+
+A Shiny app is an R script executing in an active R environment that uses functions available in the Shiny package to interact with a web browser.  The basic components of a Shiny script are
+
+\begin{itemize}
+    \item \texttt{ui()} function
+    \begin{itemize}[noitemsep]
+        \item Contains your web page layout and screen objects for inputs (prompt fields) and outputs (graphs, tables, etc.)
+        \item Is specified in a combination of Shiny function calls and raw HTML
+        \item Defines variables that bind web objects to the execution portion of the app
+    \end{itemize}
+    \item \texttt{server()} function
+    \begin{itemize}[noitemsep]
+        \item The execution portion of the app
+        \item Contains a combination of standard R statements and function calls, such as to \texttt{apply()}, \texttt{lm()}, \texttt{ggplot()}, etc., along with calls to functions from the Shiny package that enable reading of on-screen values and rendering of results
+    \end{itemize}
+    \item \texttt{runApp()} function
+    \begin{itemize}[noitemsep]
+        \item Creates a process listening on a tcp port, launches a browser (optional), renders a screen by calling the specified \texttt{ui()} function, then executes the R commands in the specified \texttt{server()} function
+    \end{itemize}
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Workshop material}\label{sec:accesworkshopmaterial}
+
+\subsection{RStudio Cloud}\label{sec:materialcloud}
+
+\begin{itemize}
+    \item What is RStudio Cloud?
+    \begin{itemize}[noitemsep]
+        \item \textit{We} {[RStudio]} \textit{created RStudio Cloud to make it easy for professionals, hobbyists, trainers, teachers and students to do, share, teach and learn data science using R.}
+    \end{itemize}
+    \item With RStudio Cloud
+    \begin{itemize}[noitemsep]
+        \item You do not need RStudio installed locally
+        \item Packages, example scripts, and data sets needed for the Shiny workshop are available in the Cloud environment
+    \end{itemize}
+    \item Access workshop material
+    \begin{itemize}[noitemsep]
+        \item Create an account:  \url{https://rstudio.cloud}
+        \item Create a convenient directory structure in your project
+        \item Copy workshop materials
+        \begin{itemize}[noitemsep]
+            \item Go to \url{https://rstudio.cloud/project/1768881} (Duke-Co-lab/Shiny directory)
+            \item Export a sub-directory
+            \begin{figure}[H]
+                \frame{\includegraphics[width=3.5in, trim={0 0 0 0.0}, clip]{{RStudioCloudExport}.png}}
+                \centering
+                %\caption{}
+                \label{fig:RStudioCloudExport}
+            \end{figure}
+            \item Save to your computer
+            \item Upload saved zip file to your RStudio Cloud project
+            \begin{figure}[H]
+                \frame{\includegraphics[width=3.5in, trim={0 0 0 0.0}, clip]{{RStudioCloudUpload}.png}}
+                \centering
+                %\caption{}
+                \label{fig:RStudioCloudUpload}
+            \end{figure}
+        \end{itemize}
+        \item Install packages:
+        \begin{itemize}[noitemsep]
+            \item Shiny:  \texttt{install.packages("shiny")}
+            \item ggplot:  \texttt{install.packages("ggplot2")}
+            \item Data Tables: \texttt{install.packages("maps")}
+            \item Data Tables: \texttt{install.packages("ggridges")}
+            \item Data Tables: \texttt{install.packages("ggrepel")}
+        \end{itemize}
+    \end{itemize}
+    \item All workshop scripts should function in RStudio Cloud, except OS shells that are used to automate execution
+\end{itemize}
+
+\subsection{Execute locally (copy workshop material from github repo)}\label{sec:materialgit}
+
+\begin{itemize}
+    \item Copy scripts and data from \url{https://github.com/tbalmat/Duke-Co-lab/tree/master/Session-3/Session-3-ggplot.zip}
+    \item Install packages:
+    \begin{itemize}[noitemsep]
+        \item Shiny:  \texttt{install.packages("shiny")}
+        \item \texttt{ggplot}:  \texttt{install.packages("ggplot2")}
+        \item Data Tables: \texttt{install.packages("maps")}
+        \item Data Tables: \texttt{install.packages("ggridges")}
+        \item Data Tables: \texttt{install.packages("ggrepel")}
+    \end{itemize}
+    \item All workshop scripts should function locally
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Review data tables app, V3}\label{sec:reviewapp}
+
+Material:
+\begin{itemize}
+    \item RStudio Cloud
+    \begin{itemize}[noitemsep]
+      \item \url{https://rstudio.cloud/project/1768881} (Duke-Co-lab/Shiny/Session-2-DataTables-Plots/CourseMaterial/Outline)
+      \item \url{https://rstudio.cloud/project/1768881} (Duke-Co-lab/Shiny/Session-2-DataTables-Plots/App/V3)
+    \end{itemize}
+    \item git
+    \begin{itemize}[noitemsep]
+      \item \url{https://github.com/tbalmat/Duke-Co-lab/tree/master/Session-2/CourseOutline}
+      \item \url{https://github.com/tbalmat/Duke-Co-lab/tree/master/Session-2/App/V3}
+    \end{itemize}
+\end{itemize}
+
+Discussion points:  \textit{Section 8.3 of Co-lab-Session-2-DataTables-Plots.pdf}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{U.S. commercial flight app using \texttt{ggplot} and \texttt{ggridges}}\label{sec:flightapp}
+
+The apps presented in section \ref{sec:examples} and in previous sessions of this workshop demonstrate the ability of \texttt{ggplot} to effectively represent patterns in data using a wide variety of graphs.  Combining the rich visual features of \texttt{ggplot} with the interactive features of Shiny gives a platform for developing versatile applications for exploring data in a self-directed manner, opening new avenues of understanding of the system being studied.  To demonstrate the power of \texttt{ggplot} with Shiny, we will review an app that explores U.S. domestic flight data.  Data consist of a fifty percent random sample of flights that originated and terminated in the continental U.S. in January, April, July, and October 2018.\footnote{As reported by the U.S. Bureau of Transportation Statistics on their Carrier On-Time Performance Data download site \url{https://www.transtats.bts.gov/DL_SelectFields.asp}.}  The \texttt{ggridges} extension package for \texttt{ggplot} will be used to produce density plots of flight delay time for visual comparative analysis.  Typical questions that the app helps to answer include:
+
+\begin{itemize}[noitemsep]
+    \item Which weekdays are heavy or light air travel days?
+    \item Are there seasonal differences in the volume of flights?
+    \item Which carriers service which regions, states, and cities of interest?
+    \item Are there differences in the distributions of departure delay by weekday, season, or carrier? 
+\end{itemize}
+
+Material:
+\begin{itemize}
+    \item RStudio Cloud
+    \begin{itemize}[noitemsep]
+        \item Outline: \url{https://rstudio.cloud/project/1768881} (Duke-Co-lab/Shiny/Session-3-ggplot/CourseMaterial)
+        \item Scripts: \url{https://rstudio.cloud/project/1768881} (Duke-Co-lab/Shiny/Session-3-ggplot/App)
+    \end{itemize}
+    \item git
+    \begin{itemize}[noitemsep]
+        \item Project: \url{https://github.com/tbalmat/Duke-Co-lab/tree/master/Session-3}
+        \item Outline: \url{https://github.com/tbalmat/Duke-Co-lab/tree/master/Session-3/Docs}
+        \item Scripts: \url{https://github.com/tbalmat/Duke-Co-lab/tree/master/Session-3/App}
+        \item Data: \url{https://github.com/tbalmat/Duke-Co-lab/tree/master/Session-3/SampleData}
+        \item Outline, scripts, and data: \url{https://github.com/tbalmat/Duke-Co-lab/tree/master/Session-3/Session-3-ggplot.zip}
+    \end{itemize}
+\end{itemize}
+
+Shiny scripts for this app consist of three files: \texttt{ui.r}, \texttt{server.r}, and \texttt{FlightEvaluation-Functions.r}.\\
+
+\texttt{ui.r} features of interest include (approximate line numbers appear in parentheses):
+
+\begin{itemize}
+    \item (52) \texttt{shinyUI()} is defined.  This is one of the three required elements of a Shiny app. 
+    \item (56) A browser tab title is specified
+    \item (59-63) The notification window position and appearance is modified 
+    \item (70, 71, 195) Use of \texttt{div()} and a CSS style specification to provide a slight left margin to the fluid row containing main contents
+    \item (72, 75, 131, 184) Use of \texttt{TabsetPanel()} and \texttt{TabPanel()} for separation of flight map app, delay density app, and file location controls
+    \item (78, 99, 133, 150) Use of two \texttt{fluidRow()} elements for input controls
+    \item (79-96, 100-117) Use of \texttt{column()} elements for horizontal placement of input controls (the number of columns in each row is limited to twelve; to present an aligned appearance, identical widths are specified for positionally corresponding columns in each row)
+    \item (82, 87, 92, 103, 109, 114) Use of \texttt{div()} and style elements with \texttt{vertical-align:top} and \texttt{margin-top} specifications to align controls vertically
+    \item (134-138, 151-170) Use of \texttt{margin-left} style elements in place of columns to horizontally position input controls (this overcomes the twelve column limitation and provides much greater control over positioning of elements)
+    \item Input controls include \texttt{sliderInput()}, \texttt{selectInput()}, \texttt{radioButtons()}, and \texttt{checkBoxInput()}
+    \begin{itemize}
+            \item They are identified by the value in their \texttt{inputId} parameter (the first, if parameter names are not used)
+            \item Labels appear in the \texttt{label} (second, if not named) parameter
+            \item Note the specifications for \texttt{choices}, \texttt{choiceValues}, \texttt{choiceNames}, \texttt{selected} (default values applied when transitioning from NULL during initialization - causing event triggers to fire), \texttt{multiple}, and \texttt{inline}
+            \item \textit{Discuss using a list for \texttt{choices} in a \texttt{selectInput()} specification}
+    \end{itemize}
+    \item (123-127, 176-180) Declaration of \texttt{ggplot} \texttt{plotOutput()} elements to display rendered plots (note the use of a \texttt{fluidRow()} for placement on a separate vertical section and use of \texttt{HTML("<center>")} for horizontal centering within the section)
+\end{itemize}
+
+\texttt{server.r} features of interest include (approximate line numbers appear in parentheses):
+
+\begin{itemize}  
+  \item \texttt{server.r} has no \texttt{ggplot} or \texttt{ggridges} function calls.  In this implementation, the purpose of \texttt{server.r} is to define global variables, read data to be treated, and to define functions for intercepting control when user input triggers action.
+  \item (19) Functions to implement \texttt{ggplot} and \texttt{ggridges} features are imported from \texttt{FlightEvaluation-Functions.r}.  Use of a separate script to implement application functions, keeps Shiny scripts simple, basically providing the shell needed to coordinate user input and presentation of results.
+  \item (23-25) Global vectors are defined for month and weekday labels.  Note that, although these are declared outside (seemingly above in environment-space hierarchy) of the \texttt{shinyServer()} function, they are not recognized within \texttt{shinyServer()} unless declared as globals.
+  \item (29) \texttt{shinyServer()}, another of the three required Shiny app elements, is defined.  \texttt{input} and \texttt{output} parameter values are used to reference input controls (\texttt{input\$pthreshFlight}, line 79), and output presentation objects (\texttt{output\$plotUSFlights}, line 125).  \texttt{session} is used, for instance, to update current values and appearance of input controls during program operation (\texttt{updateSelectInput()}).
+  \item (35, 83) \texttt{graphFlightMap()} and \texttt{graphFlightDelayDensity()} functions are defined to call plot composition functions (from \texttt{FlightEvaluation-Functions.r}) and render the resulting graphs, when user input prompts plot regeneration
+  \item (42-62, 88-108) Displayed plot height, width, and facet labels are adjusted based on the specified facet variable 
+  \item (39, 72, 85, 118) Use of \texttt{showNotification()} to display a warning message when no observations correspond to specified filtering values
+  \item (130, 156, 167, 180) \texttt{observeEvent()} functions are defined that monitors the state of input controls and triggers action when they are changed.  Data are read and aggregated and plot configuration functions are called with parameter values corresponding to user input values.
+  \item (149) Observe events are executed when the reactive variables being monitored undergo a change in value.  During program initialization, reactive variables (including action buttons) transition from NULL to their beginning values.  The \texttt{ignoreInit} parameter of \texttt{observeEvent()} controls whether an event function is executed after the initial reactive variable transition from NULL, with \texttt{ignoreInit=TRUE} preventing execution, which is what we desire for the \texttt{retrieveData} button.  The default value of \texttt{ignoreInit} is \texttt{FALSE}.
+  \item (156-160, 167-173, 180-188) Data aggregation and plot generation functions (\texttt{aggfdat()}, \texttt{graphFlightMap()}, and \texttt{graphFlightDelayDensity()}) are called strictly from within \texttt{obserEvent()} functions.  \texttt{ignoreInit=F} instructs to execute these monitor functions during program initialization, without which the viewer would have to alter an on-screen control before observing a plot.
+  \item (158) Aggregated data are created in the global environment to be available for plotting functions
+  \item (202) The \texttt{readData()} function is called to read flight data from source records into the global environment
+  
+
+  \item Functions for retrieving data, aggregating data, and composing plots
+  \item Reactive elements bound to R variables within \texttt{observe()} events, so that modification of input objects (selection lists, slider bars, etc) cause immediate update of plots
+  \item Observation and label filtering from change of on-screen p selectors
+  \item Arc size, color, and transparency set by on screen controls (they supply values to \texttt{aes()} parameters in \texttt{ggplot()} calls)
+  \item Faceting controlled by on-screen radio buttons
+  \item Facet labels are composed for use as a labeler in \texttt{facet\_wrap()}
+  \item Descriptive labels are joined to codes in the source data using \texttt{merge()} and displayed instead of actual codes
+  \item Overall rendered plot size is adjusted for facet panels displayed
+\end{itemize}
+
+U.S. domestic flight map (\texttt{ggplot}) features of interest include (approximate line numbers in \texttt{FlightEvaluation-Functions.r} appear in parentheses):
+
+\begin{itemize}
+  \item (11-60, \texttt{readData()} function) Observations are read from source files to the global environment
+    \item (27, 38) A progress meter advances as each file is read
+    \item (41-56) Commercial airline and airport identying data are read into the global environment
+    \item (67-120, \texttt{aggfdat()} function) Flight frequencies are aggregated by origin and destination within a third aggregation variable (for faceting).  Parameter values control whether flights are limited to those with delayed departure due tto the carrier and whether to include cancellations. 
+    \item (129-131, \texttt{composePlotMap()} function) Parameter values specify thresholds for fligh inclusion, faceting, and plot appearance.  They correspond to on-screen reactive values and are passed by corresponding \texttt{observeEvent()} function execution triggered by a change in value.
+    \item (141) Flights are filtered to those having a proportion of total above a specified threshold (pthreshFlight)
+    \item (144-166) Airport labels are composed for routes having a proportion of flights below a specified threshold (\texttt{pthreshAirportLabel})
+    \item (175) A map of the continental U.S. is generated, \texttt{using geom\_polygon()}, each polygon tracing the outline of a single state
+    \item (179) An arc is drawn, using \texttt{geom\_curve()}, from each flight origin (\texttt{x, xend}) to destination (\texttt{y, yend}).  Color, size (line weight), and transparency are a function of the proportion of all routes that a given route represents (specification of appearance variables within the aesthetic function causes treatment of individual levels of p)
+    \item (183) Specific color, line weight, and transparency values are supplied in corresponding function parameters
+    \item (190-191) Airport labels are appended to the plot object
+    \item (196) Individual plots are constructed for each level of the specified faceting variable
+    \item (200-222) A theme is appended
+    \item (227) the \texttt{ggplot} object (essentially, a list containing instructions for rendering the plot) is returned to the calling function to be rendered
+\end{itemize}
+
+Flight departure delay distribution (\texttt{ggridges}) features of interest include (approximate line numbers in \texttt{FlightEvaluation-Functions.r} appear in parentheses):
+
+\begin{itemize}
+  \item (247-254) Observations are filtered based on specified delay style and cancellation styles
+  \item (257-269) Data for the specified independent (\texttt{x}), dependent (\texttt{y}), and faceting variables are selected
+  \item (272-278) Specified dependent data factor order is imposed
+  \item (281-290) Specified fill colors are applied
+  \item (293-298) Axis labels are composed based on specified independent and dependent variables
+  \item (301-337) The plot object is constructed
+  \item (339-382) Vertical lines are included at mean, median, or zero, as specified
+  \item (387) the \texttt{ggplot} object is returned
+\end{itemize}
+
+Internals:
+\begin{itemize}
+  \item \texttt{map\_data()} function from the maps package: \url{https://cran.r-project.org/web/packages/maps/maps.pdf}
+  \item \texttt{ggplot\_build()}: \url{https://www.rdocumentation.org/packages/ggplot2/versions/3.2.1/topics/ggplot_build}
+  \item \texttt{ggplot} innards: \url{https://cran.r-project.org/web/packages/gginnards/vignettes/user-guide-2.html}
+\end{itemize}
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Debugging}\label{sec:debugging}
+
+It is important that you have a means of communicating with your app during execution.  Unlike a typical R script, that can be executed one line at a time, with interactive review of variables, once a Shiny script launches, it executes without the console prompt.  Upon termination, some global variables may be available for examination, but you may not have reliable information on when they were last updated.  Error and warning messages are displayed in the console (and the terminal session when executed in a shell) and, fortunately, so are the results of \texttt{print()} and \texttt{cat()}.  When executed in RStudio, Shiny offers sophisticated debugger features (more info at \url{https://shiny.rstudio.com/articles/debugging.html}).  However, one of the simplest methods of communicating with your app during execution is to use \texttt{print()} (for a formatted or multi-element object, such as a data frame) or \texttt{cat(, file=stderr())} for ``small" objects.  The \texttt{file=stderr()} causes displayed items to appear in red.  Output may also be written to an error log, depending on your OS.  Considerations include
+
+\begin{itemize}
+    \item Shiny reports line numbers in error messages relative to the related function (\texttt{ui()} or \texttt{server()}) and, although not always exact, reported lines are usually in the proximity of the one which was executed at the time of error
+    \item \texttt{cat("your message here")} displays in RStudio console (generally, consider Shiny Server)
+    \item \texttt{cat("your message here", file=stderr())} is treated as an error (red in console, logged by OS)
+    \item Messages appear in RStudio console when Shiny app launched from within RStudio
+    \item Messages appear in terminal window when Shiny app launched with the \texttt{rscript} command in shell
+    \item There exists a ``showcase" mode (\texttt{runApp(display.mode="showcase")}) that is intended to highlight each line of your script as it is executing
+    \item The reactivity log may be helpful in debugging reactive sequencing issues (\texttt{options(shiny.reactlog=T)}, \url{https://shiny.rstudio.com/reference/shiny/0.14/showReactLog.html}
+    \url It may be helpful to initially format an apps appearance with an empty \texttt{server()} function, then include executable statements once the screen objects are available and configured
+    \item Although not strictly related to debugging, the use of \texttt{gc()} to clear defunct memory (from R's recycling) may reduce total memory in use at a given time
+\end{itemize}
+
+
+\end{spacing}
+
+\end{document} 

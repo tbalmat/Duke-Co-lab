@@ -1,0 +1,18 @@
+\BOOKMARK [1][-]{section.1}{Overview}{}% 1
+\BOOKMARK [1][-]{section.2}{Examples}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Visualizations}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Shiny apps}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Example Data Table apps}{section.2}% 5
+\BOOKMARK [1][-]{section.3}{Resources}{}% 6
+\BOOKMARK [1][-]{section.4}{Anatomy of a Shiny App}{}% 7
+\BOOKMARK [1][-]{section.5}{Workshop Material}{}% 8
+\BOOKMARK [2][-]{subsection.5.1}{RStudio Cloud}{section.5}% 9
+\BOOKMARK [2][-]{subsection.5.2}{Execute locally \(copy workshop material from github repo\)}{section.5}% 10
+\BOOKMARK [1][-]{section.6}{Review Apps from Previous Session}{}% 11
+\BOOKMARK [2][-]{subsection.6.1}{Graph delivery map}{section.6}% 12
+\BOOKMARK [2][-]{subsection.6.2}{OPM Central Personnel Data File}{section.6}% 13
+\BOOKMARK [1][-]{section.7}{HTML and Debugging}{}% 14
+\BOOKMARK [1][-]{section.8}{OPM CPDF Analysis Using Data Tables and Plots}{}% 15
+\BOOKMARK [2][-]{subsection.8.1}{Development of analysis in R \(V1\)}{section.8}% 16
+\BOOKMARK [2][-]{subsection.8.2}{Shiny app with basic table and plot controls \(V2\)}{section.8}% 17
+\BOOKMARK [2][-]{subsection.8.3}{Shiny app with additional table and plot features \(V3\)}{section.8}% 18

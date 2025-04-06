@@ -1,0 +1,11 @@
+https://plot.ly/r/
+
+https://cran.r-project.org/web/packages/Hmisc/Hmisc.pdf
+https://www.fharrell.com/post/interactive-graphics-less/
+
+# Hmisc examples from Frank Harrell's presentation at R/Medicine 2019
+# Hmisc package:  https://cran.r-project.org/web/packages/Hmisc/Hmisc.pdf
+# Statistical thinking:  https://www.fharrell.com/post/interactive-graphics-less/
+# Presentation slides:  http://hbiostat.org/talks/rmedicine19.html
+
+gg list editing:  https://cran.r-project.org/web/packages/gginnards/vignettes/user-guide-2.html
